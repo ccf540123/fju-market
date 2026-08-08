@@ -40,7 +40,7 @@ form.addEventListener("submit", (event) => {
   const confirmPassword = confirmInput.value;
 
   if (!SCHOOL_EMAIL_PATTERN.test(email)) {
-    setMessage("請使用輔大學校信箱（@go.fju.edu.tw）");
+    setMessage("請使用輔大學校信箱（@cloud.fju.edu.tw）");
     return;
   }
 

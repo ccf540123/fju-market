@@ -11,13 +11,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (verifyBtn) {
     verifyBtn.addEventListener("click", () => {
-      window.location.href = "login.html";
+      // window.location.href = "login.html";
     });
   }
 
   if (aboutBtn) {
     aboutBtn.addEventListener("click", () => {
-      alert("輔大二手交易平台 — 專為輔仁大學師生設計的校園二手市集。");
+      alert("輔大二手交易平台 — 專為輔仁大學學生設計的校園二手市集。");
     });
   }
 });
