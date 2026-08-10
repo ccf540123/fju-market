@@ -1,58 +1,116 @@
-.container{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center ;
-    position: relative;
-  
+* {
+  box-sizing: border-box;
+}
 
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #f5f5f5;
+  color: #222;
+  font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+}
+
+/* ========== 上方導覽（與 home 一致） ========== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 14px 24px;
+}
+
+.logo {
+  flex-shrink: 0;
+  color: #111;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.header-nav {
+  display: flex;
+  gap: 18px;
+  flex: 1;
+}
+
+.header-nav a {
+  color: #444;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.header-nav a:hover {
+  color: #111;
+}
+
+/* ========== Landing 內容 ========== */
+.landing-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.landing-title {
+  margin: 0 0 8px;
+  color: #111;
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.subtitle {
+  margin: 0 0 32px;
+  color: #777;
+  font-size: 15px;
+  text-align: center;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .box {
-  width: 80%;
-  padding: 12px 24px;
-  border: 1px solid #eeeded86;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: black;
+  width: min(420px, 100%);
+  margin-bottom: 12px;
+  padding: 14px 24px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #222;
   font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.3s ease;
-  margin-bottom: 1%;
-  font-weight: 400;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .box:hover {
-  background: rgba(255, 255, 255, 0.25);           /* hover 時稍微變亮,增加互動感 */
+  background: #f0f0f0;
+  border-color: #ccc;
 }
-body {
-  background: linear-gradient(135deg, #749694 0%, #d3d1d4 100%);
-  min-height: 100vh;
-  margin: 0;
-  font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-  
-}
-h2{
-    text-align: center;
-    padding: 0 20px;
-    color:aliceblue;
-    margin-bottom: 40px;
-}
-.subtitle{
-  font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-  color: aliceblue;
-  font-size: 18px;
-  opacity: 0.9;   /* 讓它視覺上比標題稍微弱一點,製造層次 */
-  text-align: center;
+
+.product-section {
+  width: 100%;
+  margin-top: 40px;
 }
 
 .category-wrapper h3 {
+  margin: 0 0 20px;
+  color: #111;
+  font-size: 18px;
+  font-weight: 700;
   text-align: center;
-  color: aliceblue;
-  font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-  margin-bottom: 20px;
 }
 
 .category-container {
@@ -60,32 +118,30 @@ h2{
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 60px;
+  margin-bottom: 40px;
 }
 
 .category-glass {
   position: relative;
   width: 150px;
   height: 170px;
-  background: linear-gradient(rgba(255,255,255,0.13), transparent);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 25px 25px rgba(0, 0, 0, 0.25);
+  margin: 0 -40px;
+  overflow: hidden;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: 0.5s;
-  border-radius: 10px;
-  margin: 0 -40px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   transform: rotate(calc(var(--r) * 1deg));
-  font-size: 3em;
+  transition: 0.5s;
   cursor: pointer;
 }
 
 .category-container:hover .category-glass {
-  transform: rotate(0deg);
   margin: 0 10px;
+  transform: rotate(0deg);
 }
 
 .category-glass::before {
@@ -94,18 +150,29 @@ h2{
   bottom: 0;
   width: 100%;
   height: 40px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.9);
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #fff;
-  font-size: 16px;
-  font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-  border-radius: 0 0 10px 10px;
+  color: #333;
+  font-size: 14px;
 }
+
 .category-wrapper img {
-  width: 100%;        /* 寬度不超過父層容器的寬度 */
-  height: 200px;       /* 固定高度,讓每張卡片圖片一樣高,整齊 */
-  object-fit: cover;   /* 關鍵!圖片會裁切填滿,不會變形 */
-  border-radius: 8px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 720px) {
+  .landing-title {
+    font-size: 22px;
+  }
+
+  .category-glass {
+    width: 110px;
+    height: 130px;
+    margin: 0 -28px;
+  }
 }
