@@ -301,6 +301,11 @@ body {
     width: 100%;
   }
 
+  /* 手機版只留左側分類，隱藏重複的上方標籤 */
+  .related-tags {
+    display: none;
+  }
+
   .category-list {
     display: flex;
     flex-wrap: wrap;
