@@ -69,7 +69,6 @@ const products = [
 const productList = document.getElementById("product-list");
 const searchInput = document.getElementById("search-input");
 const categoryButtons = document.querySelectorAll(".category-btn");
-const tagButtons = document.querySelectorAll(".tag-btn");
 const emptyMessage = document.getElementById("empty-message");
 const productCount = document.getElementById("product-count");
 const sortSelect = document.getElementById("sort-select");
@@ -84,13 +83,9 @@ function formatPrice(price) {
   return "NT$" + price.toLocaleString("zh-TW");
 }
 
-// 同步左側分類與上方標籤的 active 狀態
+// 更新分類按鈕的 active 狀態
 function updateActiveButtons() {
   categoryButtons.forEach(function (btn) {
-    btn.classList.toggle("active", btn.dataset.category === currentCategory);
-  });
-
-  tagButtons.forEach(function (btn) {
     btn.classList.toggle("active", btn.dataset.category === currentCategory);
   });
 }
@@ -180,15 +175,8 @@ function renderProducts() {
   emptyMessage.classList.toggle("hidden", filteredProducts.length > 0);
 }
 
-// 左側分類按鈕
+// 分類按鈕
 categoryButtons.forEach(function (button) {
-  button.addEventListener("click", function () {
-    setCategory(button.dataset.category);
-  });
-});
-
-// 上方相關分類標籤
-tagButtons.forEach(function (button) {
   button.addEventListener("click", function () {
     setCategory(button.dataset.category);
   });

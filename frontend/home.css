@@ -131,32 +131,6 @@ body {
   min-width: 0;
 }
 
-.related-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-
-.tag-btn {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 4px;
-  background: #ebebeb;
-  color: #333;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.tag-btn:hover {
-  background: #ddd;
-}
-
-.tag-btn.active {
-  background: #d8d8d8;
-  font-weight: 600;
-}
-
 .list-header {
   display: flex;
   align-items: flex-end;
@@ -299,11 +273,6 @@ body {
 
   .sidebar {
     width: 100%;
-  }
-
-  /* 手機版只留左側分類，隱藏重複的上方標籤 */
-  .related-tags {
-    display: none;
   }
 
   .category-list {
