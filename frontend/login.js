@@ -14,6 +14,10 @@ function setMessage(text, type = "") {
   messageEl.className = type ? `form-message ${type}` : "form-message";
 }
 
+function goToHome() {
+  window.location.href = "home.html";
+}
+
 function switchMode(nextMode) {
   mode = nextMode;
 
@@ -32,7 +36,7 @@ tabs.forEach((tab) => {
   tab.addEventListener("click", () => switchMode(tab.dataset.mode));
 });
 
-form.addEventListener("submit", (event) => {
+form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const email = form.email.value.trim();
@@ -54,10 +58,41 @@ form.addEventListener("submit", (event) => {
     return;
   }
 
-  setMessage(
-    mode === "register"
-      ? "註冊表單驗證通過（後端 API 尚未串接）"
-      : "登入表單驗證通過（後端 API 尚未串接）",
-    "success"
-  );
+  submitBtn.disabled = true;
+  setMessage(mode === "register" ? "註冊中..." : "登入中...");
+
+  if (mode === "register") {
+    const result = await supabaseClient.auth.signUp({
+      email: email,
+      password: password,
+    });
+
+    if (result.error) {
+      setMessage(result.error.message);
+      submitBtn.disabled = false;
+      return;
+    }
+
+    if (!result.data.session) {
+      setMessage("註冊成功，請到信箱確認後再登入", "success");
+      submitBtn.disabled = false;
+      return;
+    }
+
+    goToHome();
+    return;
+  }
+
+  const result = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password,
+  });
+
+  if (result.error) {
+    setMessage(result.error.message);
+    submitBtn.disabled = false;
+    return;
+  }
+
+  goToHome();
 });

@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const loginBtn = document.querySelector('[data-action="login"]');
-  const verifyBtn = document.querySelector('[data-action="verify"]');
+  const browseBtn = document.querySelector('[data-action="browse"]');
   const aboutBtn = document.querySelector('[data-action="about"]');
 
   if (loginBtn) {
@@ -9,9 +9,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (verifyBtn) {
-    verifyBtn.addEventListener("click", () => {
-      // window.location.href = "login.html";
+  if (browseBtn) {
+    browseBtn.addEventListener("click", () => {
+      window.location.href = "home.html";
     });
   }
 

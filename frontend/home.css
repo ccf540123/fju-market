@@ -71,6 +71,39 @@ body {
   outline-offset: 0;
 }
 
+.header-auth {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-auth a {
+  color: #444;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.user-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#current-user {
+  color: #555;
+  font-size: 13px;
+}
+
+#logout-btn {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
 /* ========== 左右版面 ========== */
 .page-layout {
   display: flex;
@@ -215,10 +248,25 @@ body {
 }
 
 .product-price {
-  margin: 0;
+  margin: 0 0 10px;
   color: #d32f2f;
   font-size: 18px;
   font-weight: 700;
+}
+
+.delete-btn {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #555;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: #f5f5f5;
+  color: #d32f2f;
 }
 
 .empty-message {
@@ -252,6 +300,75 @@ body {
 .publish-btn:hover {
   transform: scale(1.04);
   background: #333;
+}
+
+.publish-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.publish-modal.hidden {
+  display: none;
+}
+
+.publish-form {
+  width: min(420px, 90%);
+  padding: 24px;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.publish-form h2 {
+  margin: 0 0 16px;
+  font-size: 20px;
+}
+
+.publish-form label {
+  display: block;
+  margin: 10px 0 6px;
+  font-size: 14px;
+}
+
+.publish-form input,
+.publish-form select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.publish-message {
+  min-height: 20px;
+  margin: 12px 0 0;
+  color: #d32f2f;
+  font-size: 14px;
+}
+
+.publish-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.publish-actions button {
+  padding: 10px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.publish-actions button[type="submit"] {
+  background: #111;
+  border-color: #111;
+  color: #fff;
 }
 
 /* ========== 手機版 ========== */

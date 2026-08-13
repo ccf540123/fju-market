@@ -10,12 +10,11 @@
     <!-- 上方導覽列：Logo + 搜尋 -->
     <header class="site-header">
         <div class="header-inner">
-            <a href="landing.html" class="logo">輔大二手市集</a>
+            <span class="logo">輔大二手市集</span>
 
             <nav class="header-nav">
-                <a href="home.html">全部商品</a>
-                <a href="#">我的收藏</a>
-                <a href="login.html">登入</a>
+                <a href="#" id="favorites-link">我的收藏</a>
+                <a href="#" id="my-products-link">我的商品</a>
             </nav>
 
             <div class="header-search">
@@ -24,6 +23,14 @@
                     id="search-input"
                     placeholder="搜尋商品"
                 >
+            </div>
+
+            <div class="header-auth">
+                <a href="login.html" id="login-link">登入</a>
+                <span id="user-area" class="user-area hidden">
+                    <span id="current-user"></span>
+                    <button type="button" id="logout-btn">登出</button>
+                </span>
             </div>
         </div>
     </header>
@@ -81,6 +88,40 @@
     <!-- 發布商品按鈕 -->
     <button type="button" id="publish-btn" class="publish-btn">＋ 發布商品</button>
 
-    <script src="home.js" defer></script>
+    <div id="publish-modal" class="publish-modal hidden">
+        <form id="publish-form" class="publish-form">
+            <h2>發布商品</h2>
+
+            <label for="product-title">商品名稱</label>
+            <input type="text" id="product-title" name="title" required>
+
+            <label for="product-price">價格</label>
+            <input type="number" id="product-price" name="price" min="0" required>
+
+            <label for="product-seller">賣家</label>
+            <input type="text" id="product-seller" name="seller" required>
+
+            <label for="product-category">分類</label>
+            <select id="product-category" name="category" required>
+                <option value="books">二手書</option>
+                <option value="electronics">3C 電子</option>
+                <option value="daily">生活用品</option>
+                <option value="clothing">服飾</option>
+                <option value="others">其他</option>
+            </select>
+
+            <p id="publish-message" class="publish-message"></p>
+
+            <div class="publish-actions">
+                <button type="button" id="cancel-publish-btn">取消</button>
+                <button type="submit">發布</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Supabase 官方函式庫（CDN） -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="home.js"></script>
 </body>
 </html>
