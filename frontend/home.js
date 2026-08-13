@@ -2,7 +2,7 @@
 let products = [];
 
 const productList = document.getElementById("product-list");
-const searchInput = document.getElementById("search-input");
+const searchInputs = document.querySelectorAll(".search-input");
 const categoryButtons = document.querySelectorAll(".category-btn");
 const emptyMessage = document.getElementById("empty-message");
 const productCount = document.getElementById("product-count");
@@ -16,8 +16,12 @@ const loginLink = document.getElementById("login-link");
 const userArea = document.getElementById("user-area");
 const currentUserEl = document.getElementById("current-user");
 const logoutBtn = document.getElementById("logout-btn");
-const favoritesLink = document.getElementById("favorites-link");
-const myProductsLink = document.getElementById("my-products-link");
+const menuBtn = document.getElementById("menu-btn");
+const drawer = document.getElementById("drawer");
+const drawerOverlay = document.getElementById("drawer-overlay");
+const drawerClose = document.getElementById("drawer-close");
+const favoritesLinks = document.querySelectorAll('[data-nav="favorites"]');
+const myProductsLinks = document.querySelectorAll('[data-nav="my-products"]');
 
 let currentUser = null;
 let currentCategory = "all";
@@ -189,9 +193,14 @@ categoryButtons.forEach(function (button) {
 });
 
 // 搜尋框輸入
-searchInput.addEventListener("input", function () {
-  currentSearch = searchInput.value.trim();
-  renderProducts();
+searchInputs.forEach(function (input) {
+  input.addEventListener("input", function () {
+    currentSearch = input.value.trim();
+    searchInputs.forEach(function (otherInput) {
+      otherInput.value = input.value;
+    });
+    renderProducts();
+  });
 });
 
 // 排序下拉選單
@@ -303,22 +312,50 @@ async function loadCurrentUser() {
   userArea.classList.remove("hidden");
 }
 
-favoritesLink.addEventListener("click", function (event) {
-  if (!requireLoginOrStay(event)) {
-    return;
-  }
+favoritesLinks.forEach(function (link) {
+  link.addEventListener("click", function (event) {
+    closeDrawer();
+    if (!requireLoginOrStay(event)) {
+      return;
+    }
 
-  event.preventDefault();
-  alert("收藏功能尚未建立");
+    event.preventDefault();
+    alert("收藏功能尚未建立");
+  });
 });
 
-myProductsLink.addEventListener("click", function (event) {
-  if (!requireLoginOrStay(event)) {
-    return;
-  }
+myProductsLinks.forEach(function (link) {
+  link.addEventListener("click", function (event) {
+    closeDrawer();
+    if (!requireLoginOrStay(event)) {
+      return;
+    }
 
-  event.preventDefault();
-  alert("我的商品頁尚未建立");
+    event.preventDefault();
+    alert("我的商品頁尚未建立");
+  });
+});
+
+function openDrawer() {
+  drawer.classList.add("open");
+  drawerOverlay.classList.add("open");
+}
+
+function closeDrawer() {
+  drawer.classList.remove("open");
+  drawerOverlay.classList.remove("open");
+}
+
+menuBtn.addEventListener("click", function () {
+  openDrawer();
+});
+
+drawerClose.addEventListener("click", function () {
+  closeDrawer();
+});
+
+drawerOverlay.addEventListener("click", function () {
+  closeDrawer();
 });
 
 logoutBtn.addEventListener("click", async function () {

@@ -10,17 +10,18 @@
     <!-- 上方導覽列：Logo + 搜尋 -->
     <header class="site-header">
         <div class="header-inner">
+            <button type="button" id="menu-btn" class="menu-btn" aria-label="開啟選單">☰</button>
             <span class="logo">輔大二手市集</span>
 
             <nav class="header-nav">
-                <a href="#" id="favorites-link">我的收藏</a>
-                <a href="#" id="my-products-link">我的商品</a>
+                <a href="#" data-nav="favorites">我的收藏</a>
+                <a href="#" data-nav="my-products">我的商品</a>
             </nav>
 
             <div class="header-search">
                 <input
                     type="search"
-                    id="search-input"
+                    class="search-input"
                     placeholder="搜尋商品"
                 >
             </div>
@@ -34,6 +35,18 @@
             </div>
         </div>
     </header>
+
+    <div id="drawer-overlay" class="drawer-overlay"></div>
+    <aside id="drawer" class="drawer">
+        <div class="drawer-header">
+            <span>選單</span>
+            <button type="button" id="drawer-close" class="drawer-close" aria-label="關閉選單">✕</button>
+        </div>
+        <nav class="drawer-nav">
+            <a href="#" data-nav="favorites">我的收藏</a>
+            <a href="#" data-nav="my-products">我的商品</a>
+        </nav>
+    </aside>
 
     <div class="page-layout">
         <!-- 左側分類篩選 -->
@@ -63,6 +76,14 @@
 
         <!-- 右側商品區 -->
         <main class="main-content">
+            <div class="page-search">
+                <input
+                    type="search"
+                    class="search-input"
+                    placeholder="搜尋商品"
+                >
+            </div>
+
             <!-- 商品列表標題列 -->
             <div class="list-header">
                 <div class="list-header-left">
