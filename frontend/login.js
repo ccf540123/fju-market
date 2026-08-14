@@ -25,6 +25,10 @@ function getAuthErrorMessage(error) {
   return text;
 }
 
+function goToHome() {
+  window.location.href = "home.html";
+}
+
 function switchMode(nextMode) {
   mode = nextMode;
 
@@ -69,40 +73,44 @@ form.addEventListener("submit", async (event) => {
   submitBtn.disabled = true;
   setMessage(mode === "register" ? "註冊中..." : "登入中...");
 
-  if (mode === "register") {
-    const result = await supabaseClient.auth.signUp({
+  try {
+    if (mode === "register") {
+      const result = await supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+      });
+
+      if (result.error) {
+        setMessage(getAuthErrorMessage(result.error));
+        return;
+      }
+
+      if (!result.data.session) {
+        setMessage("註冊成功，請到信箱確認後再登入", "success");
+        return;
+      }
+
+      goToHome();
+      return;
+    }
+
+    const result = await supabaseClient.auth.signInWithPassword({
       email: email,
       password: password,
     });
 
     if (result.error) {
       setMessage(getAuthErrorMessage(result.error));
-      submitBtn.disabled = false;
-      return;
-    }
-
-    if (!result.data.session) {
-      setMessage("註冊成功，請到信箱確認後再登入", "success");
-      submitBtn.disabled = false;
       return;
     }
 
     goToHome();
-    return;
-  }
-
-  const result = await supabaseClient.auth.signInWithPassword({
-    email: email,
-    password: password,
-  });
-
-  if (result.error) {
-    setMessage(getAuthErrorMessage(result.error));
+  } catch (error) {
+    console.error(error);
+    setMessage("登入失敗，請稍後再試");
+  } finally {
     submitBtn.disabled = false;
-    return;
   }
-
-  goToHome();
 });
 
 forgotBtn.addEventListener("click", async function () {
