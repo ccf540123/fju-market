@@ -48,15 +48,6 @@
   margin-right: 8px;
 }
 
-.password-card {
-  margin-top: 24px;
-}
-
-.password-title {
-  margin: 0 0 16px;
-  font-size: 20px;
-}
-
 @media (max-width: 720px) {
   .profile-layout .auth-card {
     padding: 24px 20px 28px;

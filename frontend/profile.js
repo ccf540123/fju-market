@@ -131,39 +131,3 @@ form.addEventListener("submit", async function (event) {
 });
 
 loadProfile();
-
-const passwordForm = document.getElementById("password-form");
-const passwordMessage = document.getElementById("password-message");
-
-passwordForm.addEventListener("submit", async function (event) {
-  event.preventDefault();
-
-  const password = document.getElementById("new-password").value;
-  const confirmPassword = document.getElementById("confirm-password").value;
-
-  if (password.length < 8) {
-    passwordMessage.textContent = "密碼至少需要 8 個字元";
-    passwordMessage.className = "form-message";
-    return;
-  }
-
-  if (password !== confirmPassword) {
-    passwordMessage.textContent = "兩次輸入的密碼不一致";
-    passwordMessage.className = "form-message";
-    return;
-  }
-
-  const result = await supabaseClient.auth.updateUser({
-    password: password,
-  });
-
-  if (result.error) {
-    passwordMessage.textContent = result.error.message;
-    passwordMessage.className = "form-message";
-    return;
-  }
-
-  passwordForm.reset();
-  passwordMessage.textContent = "密碼已更新";
-  passwordMessage.className = "form-message success";
-});
