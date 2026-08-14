@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="landing.css">
+    <link rel="stylesheet" href="product.css">
+    <title>商品詳情｜輔大二手交易平台</title>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <span class="logo">輔大二手市集</span>
+        </div>
+    </header>
+
+    <main class="product-page">
+        <a href="home.html" class="back-link">← 返回商品列表</a>
+        <p id="product-status" class="product-status">載入中...</p>
+        <article id="product-detail" class="product-detail hidden"></article>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="product.js"></script>
+</body>
+</html>

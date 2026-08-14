@@ -72,54 +72,15 @@ function createProductCard(product) {
   price.className = "product-price";
   price.textContent = formatPrice(product.price || 0);
 
-  const deleteBtn = document.createElement("button");
-  deleteBtn.type = "button";
-  deleteBtn.className = "delete-btn";
-  deleteBtn.textContent = "刪除";
-
   info.appendChild(seller);
   info.appendChild(title);
   info.appendChild(price);
-
-  if (currentUser) {
-    const deleteBtn = document.createElement("button");
-    deleteBtn.type = "button";
-    deleteBtn.className = "delete-btn";
-    deleteBtn.textContent = "刪除";
-    info.appendChild(deleteBtn);
-
-    deleteBtn.addEventListener("click", async function (event) {
-      event.stopPropagation();
-
-      if (!requireLogin()) {
-        return;
-      }
-
-      const confirmed = confirm("確定要刪除「" + product.title + "」嗎？");
-      if (!confirmed) {
-        return;
-      }
-
-      const result = await supabaseClient
-        .from("products")
-        .delete()
-        .eq("id", product.id);
-
-      if (result.error) {
-        console.error(result.error);
-        alert("刪除失敗，請稍後再試");
-        return;
-      }
-
-      loadProducts();
-    });
-  }
 
   card.appendChild(img);
   card.appendChild(info);
 
   card.addEventListener("click", function () {
-    alert("商品詳情頁尚未建立：「" + product.title + "」");
+    window.location.href = "product.html?id=" + product.id;
   });
 
   return card;
@@ -266,20 +227,47 @@ publishForm.addEventListener("submit", async function (event) {
   const seller = document.getElementById("product-seller").value.trim();
   const category = document.getElementById("product-category").value;
 
+  const imageFile = document.getElementById("product-image").files[0];
+
   if (!title || !seller || Number.isNaN(price) || price < 0) {
     publishMessage.textContent = "請填寫完整且正確的資料";
     return;
   }
 
+  if (!imageFile) {
+    publishMessage.textContent = "請上傳商品圖片";
+    return;
+  }
+
   publishMessage.textContent = "發布中...";
+
+  const filePath =
+    currentUser.id + "/" + Date.now() + "-" + imageFile.name;
+
+  const uploadResult = await supabaseClient.storage
+    .from("products")
+    .upload(filePath, imageFile);
+
+  if (uploadResult.error) {
+    console.error(uploadResult.error);
+    publishMessage.textContent = "圖片上傳失敗，請稍後再試";
+    return;
+  }
+
+  const publicUrlResult = supabaseClient.storage
+    .from("products")
+    .getPublicUrl(filePath);
+
+  const imageUrl = publicUrlResult.data.publicUrl;
 
   // insert() 會把一筆新資料寫進 products 表
   const result = await supabaseClient.from("products").insert({
     title: title,
     price: price,
     seller: seller,
+    seller_id: currentUser.id,
     category: category,
-    image: "https://placehold.co/400x400/f0f0f0/666666?text=商品",
+    image: imageUrl,
   });
 
   if (result.error) {
@@ -327,12 +315,7 @@ favoritesLinks.forEach(function (link) {
 myProductsLinks.forEach(function (link) {
   link.addEventListener("click", function (event) {
     closeDrawer();
-    if (!requireLoginOrStay(event)) {
-      return;
-    }
-
-    event.preventDefault();
-    alert("我的商品頁尚未建立");
+    requireLoginOrStay(event);
   });
 });
 
