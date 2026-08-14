@@ -22,6 +22,7 @@ const drawerOverlay = document.getElementById("drawer-overlay");
 const drawerClose = document.getElementById("drawer-close");
 const favoritesLinks = document.querySelectorAll('[data-nav="favorites"]');
 const myProductsLinks = document.querySelectorAll('[data-nav="my-products"]');
+const profileLinks = document.querySelectorAll('[data-nav="profile"]');
 
 let currentUser = null;
 let currentCategory = "all";
@@ -224,12 +225,10 @@ publishForm.addEventListener("submit", async function (event) {
 
   const title = document.getElementById("product-title").value.trim();
   const price = Number(document.getElementById("product-price").value);
-  const seller = document.getElementById("product-seller").value.trim();
   const category = document.getElementById("product-category").value;
-
   const imageFile = document.getElementById("product-image").files[0];
 
-  if (!title || !seller || Number.isNaN(price) || price < 0) {
+  if (!title || Number.isNaN(price) || price < 0) {
     publishMessage.textContent = "請填寫完整且正確的資料";
     return;
   }
@@ -238,6 +237,16 @@ publishForm.addEventListener("submit", async function (event) {
     publishMessage.textContent = "請上傳商品圖片";
     return;
   }
+
+  const profileResult = await supabaseClient
+    .from("profiles")
+    .select("display_name")
+    .eq("id", currentUser.id)
+    .maybeSingle();
+
+  const sellerName =
+    (profileResult.data && profileResult.data.display_name) ||
+    currentUser.email.split("@")[0];
 
   publishMessage.textContent = "發布中...";
 
@@ -264,7 +273,7 @@ publishForm.addEventListener("submit", async function (event) {
   const result = await supabaseClient.from("products").insert({
     title: title,
     price: price,
-    seller: seller,
+    seller: sellerName,
     seller_id: currentUser.id,
     category: category,
     image: imageUrl,
@@ -313,6 +322,13 @@ favoritesLinks.forEach(function (link) {
 });
 
 myProductsLinks.forEach(function (link) {
+  link.addEventListener("click", function (event) {
+    closeDrawer();
+    requireLoginOrStay(event);
+  });
+});
+
+profileLinks.forEach(function (link) {
   link.addEventListener("click", function (event) {
     closeDrawer();
     requireLoginOrStay(event);

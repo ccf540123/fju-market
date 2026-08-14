@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="landing.css">
+    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="profile.css">
+    <title>編輯個人檔案｜輔大二手交易平台</title>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <span class="logo">輔大二手市集</span>
+        </div>
+    </header>
+
+    <main class="auth-page profile-layout">
+        <a href="home.html" class="back-link">← 返回商品列表</a>
+
+        <h1 class="auth-title">編輯個人檔案</h1>
+        <p class="subtitle">更新你的姓名、科系與頭像</p>
+
+        <div class="auth-card">
+            <img id="avatar-preview" class="avatar-preview" alt="頭像預覽">
+
+            <form id="profile-form" class="auth-form">
+                <label for="display-name">姓名</label>
+                <input type="text" id="display-name" name="display_name" required>
+
+                <label for="department">科系</label>
+                <input type="text" id="department" name="department" placeholder="例如：資訊工程學系">
+
+                <label for="avatar-file">頭像</label>
+                <input type="file" id="avatar-file" name="avatar" accept="image/*">
+                <p class="form-hint">可從相簿選擇，或直接拍照</p>
+
+                <p id="profile-message" class="form-message"></p>
+
+                <button type="submit" class="box auth-submit">儲存</button>
+            </form>
+        </div>
+
+        <div class="auth-card password-card">
+            <h2 class="password-title">修改密碼</h2>
+            <form id="password-form" class="auth-form">
+                <label for="new-password">新密碼</label>
+                <input type="password" id="new-password" minlength="8" required placeholder="至少 8 個字元">
+
+                <label for="confirm-password">確認新密碼</label>
+                <input type="password" id="confirm-password" minlength="8" required placeholder="再次輸入新密碼">
+
+                <p id="password-message" class="form-message"></p>
+                <button type="submit" class="box auth-submit">更新密碼</button>
+            </form>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="profile.js"></script>
+</body>
+</html>

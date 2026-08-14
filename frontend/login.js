@@ -6,6 +6,7 @@ const confirmGroup = document.getElementById("confirm-password-group");
 const confirmInput = document.getElementById("confirm-password");
 const messageEl = document.getElementById("form-message");
 const submitBtn = document.querySelector(".auth-submit");
+const forgotBtn = document.getElementById("forgot-password-btn");
 
 let mode = "login";
 
@@ -29,6 +30,7 @@ function switchMode(nextMode) {
   confirmGroup.classList.toggle("hidden", !isRegister);
   confirmInput.required = isRegister;
   submitBtn.textContent = isRegister ? "註冊" : "登入";
+  forgotBtn.classList.toggle("hidden", isRegister);
   setMessage("");
 }
 
@@ -95,4 +97,30 @@ form.addEventListener("submit", async (event) => {
   }
 
   goToHome();
+});
+
+forgotBtn.addEventListener("click", async function () {
+  const email = form.email.value.trim();
+
+  if (!SCHOOL_EMAIL_PATTERN.test(email)) {
+    setMessage("請先輸入輔大學校信箱（@cloud.fju.edu.tw）");
+    return;
+  }
+
+  forgotBtn.disabled = true;
+  setMessage("寄送重設信件中...");
+
+  const redirectTo = new URL("reset-password.html", window.location.href).href;
+  const result = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: redirectTo,
+  });
+
+  if (result.error) {
+    setMessage(result.error.message);
+    forgotBtn.disabled = false;
+    return;
+  }
+
+  setMessage("重設信件已寄出，請到信箱點開連結", "success");
+  forgotBtn.disabled = false;
 });

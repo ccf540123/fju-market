@@ -124,3 +124,14 @@
 .hidden {
   display: none;
 }
+
+.forgot-link {
+  margin-top: 12px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #555;
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+}

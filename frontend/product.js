@@ -22,7 +22,7 @@ function showError(text) {
   detailEl.classList.add("hidden");
 }
 
-function showProduct(product) {
+function showProduct(product, sellerProfile) {
   statusEl.classList.add("hidden");
   detailEl.classList.remove("hidden");
   detailEl.textContent = "";
@@ -41,9 +41,24 @@ function showProduct(product) {
   price.className = "product-price";
   price.textContent = formatPrice(product.price || 0);
 
-  const seller = document.createElement("p");
-  seller.className = "product-meta";
-  seller.textContent = "賣家：" + (product.seller || "未知賣家");
+  const sellerName =
+    (sellerProfile && sellerProfile.display_name) ||
+    product.seller ||
+    "未知賣家";
+
+  const sellerLine = document.createElement("p");
+  sellerLine.className = "product-meta";
+
+  if (product.seller_id) {
+    sellerLine.appendChild(document.createTextNode("賣家："));
+    const sellerLink = document.createElement("a");
+    sellerLink.className = "seller-link";
+    sellerLink.href = "seller.html?id=" + product.seller_id;
+    sellerLink.textContent = sellerName + "（查看檔案）";
+    sellerLine.appendChild(sellerLink);
+  } else {
+    sellerLine.textContent = "賣家：" + sellerName;
+  }
 
   const category = document.createElement("p");
   category.className = "product-meta";
@@ -51,7 +66,7 @@ function showProduct(product) {
 
   info.appendChild(title);
   info.appendChild(price);
-  info.appendChild(seller);
+  info.appendChild(sellerLine);
   info.appendChild(category);
 
   if (product.descirption) {
@@ -88,7 +103,19 @@ async function loadProduct() {
   }
 
   document.title = result.data.title + "｜輔大二手交易平台";
-  showProduct(result.data);
+
+  let sellerProfile = null;
+  if (result.data.seller_id) {
+    const profileResult = await supabaseClient
+      .from("profiles")
+      .select("display_name, avatar_url")
+      .eq("id", result.data.seller_id)
+      .maybeSingle();
+
+    sellerProfile = profileResult.data;
+  }
+
+  showProduct(result.data, sellerProfile);
 }
 
 loadProduct();
