@@ -15,8 +15,14 @@ function setMessage(text, type = "") {
   messageEl.className = type ? `form-message ${type}` : "form-message";
 }
 
-function goToHome() {
-  window.location.href = "home.html";
+function getAuthErrorMessage(error) {
+  const text = (error && error.message) || "";
+
+  if (text.toLowerCase().indexOf("invalid login credentials") !== -1) {
+    return "密碼錯誤";
+  }
+
+  return text;
 }
 
 function switchMode(nextMode) {
@@ -70,7 +76,7 @@ form.addEventListener("submit", async (event) => {
     });
 
     if (result.error) {
-      setMessage(result.error.message);
+      setMessage(getAuthErrorMessage(result.error));
       submitBtn.disabled = false;
       return;
     }
@@ -91,7 +97,7 @@ form.addEventListener("submit", async (event) => {
   });
 
   if (result.error) {
-    setMessage(result.error.message);
+    setMessage(getAuthErrorMessage(result.error));
     submitBtn.disabled = false;
     return;
   }
