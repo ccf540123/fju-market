@@ -15,6 +15,7 @@ const publishMessage = document.getElementById("publish-message");
 const loginLink = document.getElementById("login-link");
 const userArea = document.getElementById("user-area");
 const currentUserEl = document.getElementById("current-user");
+const currentUserNameEl = document.getElementById("current-user-name");
 const logoutBtn = document.getElementById("logout-btn");
 const menuBtn = document.getElementById("menu-btn");
 const drawer = document.getElementById("drawer");
@@ -304,7 +305,21 @@ async function loadCurrentUser() {
     return;
   }
 
-  currentUserEl.textContent = currentUser.email;
+  const profileResult = await supabaseClient
+    .from("profiles")
+    .select("avatar_url, display_name")
+    .eq("id", currentUser.id)
+    .maybeSingle();
+
+  const profile = profileResult.data || {};
+  const displayName = profile.display_name || currentUser.email.split("@")[0];
+  const avatarUrl =
+    profile.avatar_url ||
+    "https://placehold.co/36x36/f0f0f0/666666?text=頭像";
+
+  currentUserEl.src = avatarUrl;
+  currentUserEl.alt = "使用者頭像";
+  currentUserNameEl.textContent = displayName;
   loginLink.classList.add("hidden");
   userArea.classList.remove("hidden");
 }

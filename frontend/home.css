@@ -91,8 +91,19 @@ body {
 }
 
 #current-user {
+  display: block;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e5e5e5;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f5f5f5;
+}
+
+.current-user-name {
   color: #555;
   font-size: 13px;
+  line-height: 1.2;
 }
 
 #logout-btn {
