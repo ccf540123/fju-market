@@ -54,11 +54,12 @@
     </aside>
 
     <div class="page-layout">
-        <!-- 左側分類篩選 -->
+        <!-- 左側分類篩選：點主分類後，子分類嵌在該項目下方 -->
         <aside class="sidebar">
             <h2 class="sidebar-title">商品分類</h2>
-            <ul class="category-list" id="category-list"></ul>
-            <div id="subcategory-list" class="subcategory-list hidden"></div>
+            <div class="category-cascade">
+                <ul class="category-list" id="category-list"></ul>
+            </div>
         </aside>
 
         <!-- 右側商品區 -->

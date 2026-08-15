@@ -3,7 +3,6 @@ let products = [];
 
 const productList = document.getElementById("product-list");
 const searchInputs = document.querySelectorAll(".search-input");
-let categoryButtons = [];
 const emptyMessage = document.getElementById("empty-message");
 const productCount = document.getElementById("product-count");
 const sortSelect = document.getElementById("sort-select");
@@ -22,7 +21,6 @@ const drawer = document.getElementById("drawer");
 const drawerOverlay = document.getElementById("drawer-overlay");
 const drawerClose = document.getElementById("drawer-close");
 const categoryList = document.getElementById("category-list");
-const subcategoryList = document.getElementById("subcategory-list");
 const parentCategorySelect = document.getElementById("product-parent-category");
 const subcategorySelect = document.getElementById("product-subcategory");
 const favoritesLinks = document.querySelectorAll('[data-nav="favorites"]');
@@ -111,76 +109,79 @@ function getSubcategoriesForParent(parentId) {
   return subcategoriesByParent.get(String(parentId)) || [];
 }
 
-function renderParentCategoryList() {
-  const buttons = [
-    '<li><button type="button" class="category-btn active" data-category="all">全部商品</button></li>',
+function renderCategoryMenu() {
+  const items = [
+    '<li class="category-item">' +
+      '<button type="button" class="category-btn' +
+      (currentCategory === "all" ? " active" : "") +
+      '" data-category="all"><span>全部商品</span></button>' +
+      "</li>",
   ];
 
   parentCategories.forEach(function (category) {
-    buttons.push(
-      '<li><button type="button" class="category-btn" data-category="' +
-        String(category.id) +
-        '">' +
-        category.name +
-        "</button></li>"
-    );
+    const parentId = String(category.id);
+    const isOpen = String(currentCategory) === parentId;
+    const children = getSubcategoriesForParent(parentId);
+    const hasChildren = children.length > 0;
+    const arrowHtml = hasChildren
+      ? '<span class="category-arrow" aria-hidden="true">' +
+        (isOpen ? "˅" : "›") +
+        "</span>"
+      : "";
+
+    let html =
+      '<li class="category-item' +
+      (isOpen ? " is-open" : "") +
+      '">' +
+      '<button type="button" class="category-btn' +
+      (isOpen ? " active" : "") +
+      '" data-category="' +
+      parentId +
+      '"><span>' +
+      category.name +
+      "</span>" +
+      arrowHtml +
+      "</button>";
+
+    // 只有目前選到的主分類，才在該項目下方展開子分類
+    if (isOpen && hasChildren) {
+      html += '<ul class="subcategory-list">';
+      html +=
+        '<li><button type="button" class="subcategory-btn' +
+        (currentSubcategory === "all" ? " active" : "") +
+        '" data-subcategory="all"><span>全部</span></button></li>';
+
+      children.forEach(function (child) {
+        const isActive = String(currentSubcategory) === String(child.id);
+        html +=
+          '<li><button type="button" class="subcategory-btn' +
+          (isActive ? " active" : "") +
+          '" data-subcategory="' +
+          String(child.id) +
+          '"><span>' +
+          child.name +
+          "</span></button></li>";
+      });
+
+      html += "</ul>";
+    }
+
+    html += "</li>";
+    items.push(html);
   });
 
-  categoryList.innerHTML = buttons.join("");
-  categoryButtons = document.querySelectorAll(".category-btn");
+  categoryList.innerHTML = items.join("");
 
-  categoryButtons.forEach(function (button) {
+  categoryList.querySelectorAll(".category-btn").forEach(function (button) {
     button.addEventListener("click", function () {
       setCategory(button.dataset.category);
     });
   });
 
-  updateActiveButtons();
-}
-
-function renderSubcategoryList() {
-  if (currentCategory === "all") {
-    subcategoryList.innerHTML = "";
-    subcategoryList.classList.add("hidden");
-    currentSubcategory = "all";
-    return;
-  }
-
-  const children = getSubcategoriesForParent(currentCategory);
-
-  if (!children.length) {
-    subcategoryList.innerHTML = "";
-    subcategoryList.classList.add("hidden");
-    currentSubcategory = "all";
-    return;
-  }
-
-  const buttons = [
-    '<button type="button" class="subcategory-btn ' +
-      (currentSubcategory === "all" ? "active" : "") +
-      '" data-subcategory="all">全部</button>',
-  ];
-
-  children.forEach(function (category) {
-    const isActive = String(currentSubcategory) === String(category.id);
-    buttons.push(
-      '<button type="button" class="subcategory-btn ' +
-        (isActive ? "active" : "") +
-        '" data-subcategory="' +
-        String(category.id) +
-        '">' +
-        category.name +
-        "</button>"
-    );
-  });
-
-  subcategoryList.innerHTML = buttons.join("");
-  subcategoryList.classList.remove("hidden");
-
-  subcategoryList.querySelectorAll(".subcategory-btn").forEach(function (button) {
+  categoryList.querySelectorAll(".subcategory-btn").forEach(function (button) {
     button.addEventListener("click", function () {
       currentSubcategory = button.dataset.subcategory;
-      renderSubcategoryList();
+      renderCategoryMenu();
       renderProducts();
     });
   });
@@ -234,20 +235,17 @@ function updatePublishSubcategoryOptions(parentId) {
       .join("");
 }
 
-function updateActiveButtons() {
-  categoryButtons.forEach(function (btn) {
-    btn.classList.toggle(
-      "active",
-      String(btn.dataset.category) === String(currentCategory)
-    );
-  });
-}
-
 function setCategory(category) {
-  currentCategory = category;
-  currentSubcategory = "all";
-  updateActiveButtons();
-  renderSubcategoryList();
+  // 再點一次同一個主分類 → 收合
+  if (String(currentCategory) === String(category) && category !== "all") {
+    currentCategory = "all";
+    currentSubcategory = "all";
+  } else {
+    currentCategory = category;
+    currentSubcategory = "all";
+  }
+
+  renderCategoryMenu();
   renderProducts();
 }
 
@@ -433,8 +431,7 @@ async function loadCategories() {
     }
   });
 
-  renderParentCategoryList();
-  renderSubcategoryList();
+  renderCategoryMenu();
   renderPublishCategoryOptions();
   renderProducts();
 }
