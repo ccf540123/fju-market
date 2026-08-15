@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="landing.css">
+    <link rel="stylesheet" href="product.css">
+    <link rel="stylesheet" href="chat.css">
+    <title>聊天｜輔大二手交易平台</title>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <span class="logo">輔大二手市集</span>
+        </div>
+    </header>
+
+    <main class="product-page chat-page">
+        <a href="messages.html" class="back-link">← 返回訊息列表</a>
+        <h1 id="chat-title" class="list-title">聊天</h1>
+        <p id="chat-status" class="product-status">載入中...</p>
+
+        <div id="chat-box" class="chat-box hidden">
+            <div id="message-list" class="message-list"></div>
+            <form id="chat-form" class="chat-form">
+                <input
+                    type="text"
+                    id="message-input"
+                    placeholder="輸入訊息..."
+                    autocomplete="off"
+                    required
+                >
+                <button type="submit">送出</button>
+            </form>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="chat.js"></script>
+</body>
+</html>

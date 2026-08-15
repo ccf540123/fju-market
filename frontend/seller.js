@@ -7,6 +7,16 @@ const departmentEl = document.getElementById("seller-department");
 async function loadSeller() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
+  const productId = params.get("productId");
+  const backLink = document.getElementById("back-link");
+
+  if (productId) {
+    backLink.href = "product.html?id=" + productId;
+    backLink.textContent = "← 返回商品";
+  } else {
+    backLink.href = "home.html";
+    backLink.textContent = "← 返回商品列表";
+  }
 
   if (!id) {
     statusEl.textContent = "找不到賣家";

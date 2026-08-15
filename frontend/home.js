@@ -3,7 +3,7 @@ let products = [];
 
 const productList = document.getElementById("product-list");
 const searchInputs = document.querySelectorAll(".search-input");
-const categoryButtons = document.querySelectorAll(".category-btn");
+let categoryButtons = [];
 const emptyMessage = document.getElementById("empty-message");
 const productCount = document.getElementById("product-count");
 const sortSelect = document.getElementById("sort-select");
@@ -21,32 +21,240 @@ const menuBtn = document.getElementById("menu-btn");
 const drawer = document.getElementById("drawer");
 const drawerOverlay = document.getElementById("drawer-overlay");
 const drawerClose = document.getElementById("drawer-close");
+const categoryList = document.getElementById("category-list");
+const subcategoryList = document.getElementById("subcategory-list");
+const parentCategorySelect = document.getElementById("product-parent-category");
+const subcategorySelect = document.getElementById("product-subcategory");
 const favoritesLinks = document.querySelectorAll('[data-nav="favorites"]');
+const messagesLinks = document.querySelectorAll('[data-nav="messages"]');
 const myProductsLinks = document.querySelectorAll('[data-nav="my-products"]');
 const profileLinks = document.querySelectorAll('[data-nav="profile"]');
 
 let currentUser = null;
+let favoriteIds = [];
+let categories = [];
+let parentCategories = [];
+let subcategoriesByParent = new Map();
 let currentCategory = "all";
+let currentSubcategory = "all";
 let currentSearch = "";
 let currentSort = "newest";
+
+function getCategoryById(categoryId) {
+  if (!categoryId) {
+    return null;
+  }
+
+  return categories.find(function (category) {
+    return String(category.id) === String(categoryId);
+  }) || null;
+}
+
+function getProductCategoryContext(product) {
+  const categoryId = product && product.category_id ? product.category_id : null;
+  const category = categoryId ? getCategoryById(categoryId) : null;
+
+  if (category) {
+    if (category.parent_id) {
+      const parentCategory = getCategoryById(category.parent_id);
+      return {
+        parentId: parentCategory ? String(parentCategory.id) : null,
+        subcategoryId: String(category.id),
+        label: parentCategory
+          ? parentCategory.name + " / " + category.name
+          : category.name,
+      };
+    }
+
+    return {
+      parentId: String(category.id),
+      subcategoryId: null,
+      label: category.name,
+    };
+  }
+
+  // 舊資料只有文字 category 時的備援
+  const legacyNames = {
+    books: "書籍",
+    electronics: "3C 電子",
+    daily: "生活用品",
+    clothing: "服飾",
+    others: "其他",
+  };
+
+  if (product && product.category && legacyNames[product.category]) {
+    const parentName = legacyNames[product.category];
+    const parentCategory = parentCategories.find(function (item) {
+      return item.name === parentName;
+    });
+
+    return {
+      parentId: parentCategory ? String(parentCategory.id) : null,
+      subcategoryId: null,
+      label: parentName,
+    };
+  }
+
+  return {
+    parentId: null,
+    subcategoryId: null,
+    label: "未分類",
+  };
+}
+
+function getSubcategoriesForParent(parentId) {
+  if (!parentId || parentId === "all") {
+    return [];
+  }
+
+  return subcategoriesByParent.get(String(parentId)) || [];
+}
+
+function renderParentCategoryList() {
+  const buttons = [
+    '<li><button type="button" class="category-btn active" data-category="all">全部商品</button></li>',
+  ];
+
+  parentCategories.forEach(function (category) {
+    buttons.push(
+      '<li><button type="button" class="category-btn" data-category="' +
+        String(category.id) +
+        '">' +
+        category.name +
+        "</button></li>"
+    );
+  });
+
+  categoryList.innerHTML = buttons.join("");
+  categoryButtons = document.querySelectorAll(".category-btn");
+
+  categoryButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      setCategory(button.dataset.category);
+    });
+  });
+
+  updateActiveButtons();
+}
+
+function renderSubcategoryList() {
+  if (currentCategory === "all") {
+    subcategoryList.innerHTML = "";
+    subcategoryList.classList.add("hidden");
+    currentSubcategory = "all";
+    return;
+  }
+
+  const children = getSubcategoriesForParent(currentCategory);
+
+  if (!children.length) {
+    subcategoryList.innerHTML = "";
+    subcategoryList.classList.add("hidden");
+    currentSubcategory = "all";
+    return;
+  }
+
+  const buttons = [
+    '<button type="button" class="subcategory-btn ' +
+      (currentSubcategory === "all" ? "active" : "") +
+      '" data-subcategory="all">全部</button>',
+  ];
+
+  children.forEach(function (category) {
+    const isActive = String(currentSubcategory) === String(category.id);
+    buttons.push(
+      '<button type="button" class="subcategory-btn ' +
+        (isActive ? "active" : "") +
+        '" data-subcategory="' +
+        String(category.id) +
+        '">' +
+        category.name +
+        "</button>"
+    );
+  });
+
+  subcategoryList.innerHTML = buttons.join("");
+  subcategoryList.classList.remove("hidden");
+
+  subcategoryList.querySelectorAll(".subcategory-btn").forEach(function (button) {
+    button.addEventListener("click", function () {
+      currentSubcategory = button.dataset.subcategory;
+      renderSubcategoryList();
+      renderProducts();
+    });
+  });
+}
+
+function renderPublishCategoryOptions() {
+  parentCategorySelect.innerHTML =
+    '<option value="">請選擇主分類</option>' +
+    parentCategories
+      .map(function (category) {
+        return (
+          '<option value="' +
+          String(category.id) +
+          '">' +
+          category.name +
+          "</option>"
+        );
+      })
+      .join("");
+
+  subcategorySelect.innerHTML = '<option value="">請先選主分類</option>';
+  subcategorySelect.disabled = true;
+}
+
+function updatePublishSubcategoryOptions(parentId) {
+  if (!parentId) {
+    subcategorySelect.innerHTML = '<option value="">請先選主分類</option>';
+    subcategorySelect.disabled = true;
+    return;
+  }
+
+  const children = getSubcategoriesForParent(parentId);
+
+  if (!children.length) {
+    subcategorySelect.innerHTML = '<option value="">此主分類沒有子分類</option>';
+    subcategorySelect.disabled = true;
+    return;
+  }
+
+  subcategorySelect.innerHTML =
+    '<option value="">請選擇子分類</option>' +
+    children
+      .map(function (category) {
+        return (
+          '<option value="' +
+          String(category.id) +
+          '">' +
+          category.name +
+          "</option>"
+        );
+      })
+      .join("");
+  subcategorySelect.disabled = false;
+}
+
+function updateActiveButtons() {
+  categoryButtons.forEach(function (btn) {
+    btn.classList.toggle(
+      "active",
+      String(btn.dataset.category) === String(currentCategory)
+    );
+  });
+}
+
+function setCategory(category) {
+  currentCategory = category;
+  currentSubcategory = "all";
+  updateActiveButtons();
+  renderSubcategoryList();
+  renderProducts();
+}
 
 // 把價格加上千分位，例如 3852 → 3,852
 function formatPrice(price) {
   return "NT$" + Number(price).toLocaleString("zh-TW");
-}
-
-// 更新分類按鈕的 active 狀態
-function updateActiveButtons() {
-  categoryButtons.forEach(function (btn) {
-    btn.classList.toggle("active", btn.dataset.category === currentCategory);
-  });
-}
-
-// 切換分類
-function setCategory(category) {
-  currentCategory = category;
-  updateActiveButtons();
-  renderProducts();
 }
 
 // 把一個商品資料變成卡片 DOM 元素
@@ -70,16 +278,74 @@ function createProductCard(product) {
   title.className = "product-title";
   title.textContent = product.title;
 
+  const category = document.createElement("p");
+  category.className = "product-category";
+  category.textContent = getProductCategoryContext(product).label;
+
   const price = document.createElement("p");
   price.className = "product-price";
   price.textContent = formatPrice(product.price || 0);
 
+  const favoriteBtn = document.createElement("button");
+  favoriteBtn.type = "button";
+  favoriteBtn.className = "favorite-btn";
+  const isFavorited = favoriteIds.indexOf(product.id) !== -1;
+  favoriteBtn.textContent = isFavorited ? "已收藏" : "收藏";
+  if (isFavorited) {
+    favoriteBtn.classList.add("active");
+  }
+
   info.appendChild(seller);
   info.appendChild(title);
+  info.appendChild(category);
   info.appendChild(price);
+  info.appendChild(favoriteBtn);
 
   card.appendChild(img);
   card.appendChild(info);
+
+  favoriteBtn.addEventListener("click", async function (event) {
+    event.stopPropagation();
+
+    if (!requireLogin()) {
+      return;
+    }
+
+    const alreadyFavorited = favoriteIds.indexOf(product.id) !== -1;
+
+    if (alreadyFavorited) {
+      const result = await supabaseClient
+        .from("favorites")
+        .delete()
+        .eq("user_id", currentUser.id)
+        .eq("product_id", product.id);
+
+      if (result.error) {
+        console.error(result.error);
+        alert("取消收藏失敗，請稍後再試");
+        return;
+      }
+
+      favoriteIds = favoriteIds.filter(function (id) {
+        return id !== product.id;
+      });
+    } else {
+      const result = await supabaseClient.from("favorites").insert({
+        user_id: currentUser.id,
+        product_id: product.id,
+      });
+
+      if (result.error) {
+        console.error(result.error);
+        alert("收藏失敗，請稍後再試");
+        return;
+      }
+
+      favoriteIds.push(product.id);
+    }
+
+    renderProducts();
+  });
 
   card.addEventListener("click", function () {
     window.location.href = "product.html?id=" + product.id;
@@ -93,8 +359,14 @@ function renderProducts() {
   const keyword = currentSearch.toLowerCase();
 
   let filteredProducts = products.filter(function (product) {
-    const matchCategory =
-      currentCategory === "all" || product.category === currentCategory;
+    const productContext = getProductCategoryContext(product);
+    const parentMatch =
+      currentCategory === "all" ||
+      String(productContext.parentId) === String(currentCategory);
+
+    const subcategoryMatch =
+      currentSubcategory === "all" ||
+      String(productContext.subcategoryId) === String(currentSubcategory);
 
     const sellerText = (product.seller || "").toLowerCase();
     const matchSearch =
@@ -102,7 +374,7 @@ function renderProducts() {
       product.title.toLowerCase().includes(keyword) ||
       sellerText.includes(keyword);
 
-    return matchCategory && matchSearch;
+    return parentMatch && subcategoryMatch && matchSearch;
   });
 
   // 排序：slice() 先複製一份，避免改到原本陣列
@@ -128,6 +400,68 @@ function renderProducts() {
   emptyMessage.classList.toggle("hidden", filteredProducts.length > 0);
 }
 
+async function loadCategories() {
+  try {
+    const result = await supabaseClient
+      .from("categories")
+      .select("*")
+      .order("level", { ascending: true })
+      .order("name", { ascending: true });
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    categories = result.data || [];
+  } catch (error) {
+    console.warn("categories table unavailable; falling back to legacy category values", error);
+    categories = [];
+  }
+
+  parentCategories = categories.filter(function (category) {
+    return category.parent_id === null;
+  });
+
+  subcategoriesByParent = new Map();
+
+  categories.forEach(function (category) {
+    if (category.parent_id) {
+      const key = String(category.parent_id);
+      if (!subcategoriesByParent.has(key)) {
+        subcategoriesByParent.set(key, []);
+      }
+      subcategoriesByParent.get(key).push(category);
+    }
+  });
+
+  renderParentCategoryList();
+  renderSubcategoryList();
+  renderPublishCategoryOptions();
+  renderProducts();
+}
+
+async function loadFavoriteIds() {
+  favoriteIds = [];
+
+  if (!currentUser) {
+    return;
+  }
+
+  const result = await supabaseClient
+    .from("favorites")
+    .select("product_id")
+    .eq("user_id", currentUser.id);
+
+  if (result.error) {
+    console.error(result.error);
+    return;
+  }
+
+  favoriteIds = result.data.map(function (row) {
+    return row.product_id;
+  });
+}
+
 // 從 Supabase 抓商品資料
 async function loadProducts() {
   emptyMessage.classList.remove("hidden");
@@ -144,15 +478,13 @@ async function loadProducts() {
   }
 
   products = result.data;
+  await loadFavoriteIds();
   emptyMessage.textContent = "找不到符合的商品";
   renderProducts();
 }
 
-// 分類按鈕
-categoryButtons.forEach(function (button) {
-  button.addEventListener("click", function () {
-    setCategory(button.dataset.category);
-  });
+parentCategorySelect.addEventListener("change", function () {
+  updatePublishSubcategoryOptions(parentCategorySelect.value);
 });
 
 // 搜尋框輸入
@@ -180,6 +512,7 @@ function openPublishModal() {
 function closePublishModal() {
   publishModal.classList.add("hidden");
   publishForm.reset();
+  updatePublishSubcategoryOptions("");
   publishMessage.textContent = "";
 }
 
@@ -226,11 +559,17 @@ publishForm.addEventListener("submit", async function (event) {
 
   const title = document.getElementById("product-title").value.trim();
   const price = Number(document.getElementById("product-price").value);
-  const category = document.getElementById("product-category").value;
+  const parentCategoryId = parentCategorySelect.value;
+  const subcategoryId = subcategorySelect.value;
   const imageFile = document.getElementById("product-image").files[0];
 
   if (!title || Number.isNaN(price) || price < 0) {
     publishMessage.textContent = "請填寫完整且正確的資料";
+    return;
+  }
+
+  if (!parentCategoryId || !subcategoryId) {
+    publishMessage.textContent = "請選擇分類";
     return;
   }
 
@@ -269,14 +608,21 @@ publishForm.addEventListener("submit", async function (event) {
     .getPublicUrl(filePath);
 
   const imageUrl = publicUrlResult.data.publicUrl;
+  const selectedSubcategory = getCategoryById(subcategoryId);
+  const selectedParent = getCategoryById(parentCategoryId);
 
-  // insert() 會把一筆新資料寫進 products 表
+  // 新商品以 category_id（子分類）為準；文字 category 只當相容備援
   const result = await supabaseClient.from("products").insert({
     title: title,
     price: price,
     seller: sellerName,
     seller_id: currentUser.id,
-    category: category,
+    category_id: Number(subcategoryId),
+    category: selectedSubcategory
+      ? selectedSubcategory.name
+      : selectedParent
+        ? selectedParent.name
+        : "未分類",
     image: imageUrl,
   });
 
@@ -290,9 +636,10 @@ publishForm.addEventListener("submit", async function (event) {
   loadProducts();
 });
 
-// 先確認登入狀態，再載入商品（未登入仍可瀏覽）
-loadCurrentUser().then(function () {
-  loadProducts();
+// 先確認登入狀態，再載入分類與商品（未登入仍可瀏覽）
+loadCurrentUser().then(async function () {
+  await loadCategories();
+  await loadProducts();
 });
 
 async function loadCurrentUser() {
@@ -327,12 +674,14 @@ async function loadCurrentUser() {
 favoritesLinks.forEach(function (link) {
   link.addEventListener("click", function (event) {
     closeDrawer();
-    if (!requireLoginOrStay(event)) {
-      return;
-    }
+    requireLoginOrStay(event);
+  });
+});
 
-    event.preventDefault();
-    alert("收藏功能尚未建立");
+messagesLinks.forEach(function (link) {
+  link.addEventListener("click", function (event) {
+    closeDrawer();
+    requireLoginOrStay(event);
   });
 });
 

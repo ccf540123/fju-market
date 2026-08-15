@@ -14,7 +14,8 @@
             <span class="logo">輔大二手市集</span>
 
             <nav class="header-nav">
-                <a href="#" data-nav="favorites">我的收藏</a>
+                <a href="favorites.html" data-nav="favorites">我的收藏</a>
+                <a href="messages.html" data-nav="messages">我的訊息</a>
                 <a href="my-products.html" data-nav="my-products">我的商品</a>
                 <a href="profile.html" data-nav="profile">編輯個人檔案</a>
             </nav>
@@ -45,7 +46,8 @@
             <button type="button" id="drawer-close" class="drawer-close" aria-label="關閉選單">✕</button>
         </div>
         <nav class="drawer-nav">
-            <a href="#" data-nav="favorites">我的收藏</a>
+            <a href="favorites.html" data-nav="favorites">我的收藏</a>
+            <a href="messages.html" data-nav="messages">我的訊息</a>
             <a href="my-products.html" data-nav="my-products">我的商品</a>
             <a href="profile.html" data-nav="profile">編輯個人檔案</a>
         </nav>
@@ -55,26 +57,8 @@
         <!-- 左側分類篩選 -->
         <aside class="sidebar">
             <h2 class="sidebar-title">商品分類</h2>
-            <ul class="category-list" id="category-list">
-                <li>
-                    <button type="button" class="category-btn active" data-category="all">全部商品</button>
-                </li>
-                <li>
-                    <button type="button" class="category-btn" data-category="books">書籍</button>
-                </li>
-                <li>
-                    <button type="button" class="category-btn" data-category="electronics">3C 電子</button>
-                </li>
-                <li>
-                    <button type="button" class="category-btn" data-category="daily">生活用品</button>
-                </li>
-                <li>
-                    <button type="button" class="category-btn" data-category="clothing">服飾</button>
-                </li>
-                <li>
-                    <button type="button" class="category-btn" data-category="others">其他</button>
-                </li>
-            </ul>
+            <ul class="category-list" id="category-list"></ul>
+            <div id="subcategory-list" class="subcategory-list hidden"></div>
         </aside>
 
         <!-- 右側商品區 -->
@@ -122,13 +106,14 @@
             <label for="product-price">價格</label>
             <input type="number" id="product-price" name="price" min="0" required>
 
-            <label for="product-category">分類</label>
-            <select id="product-category" name="category" required>
-                <option value="books">二手書</option>
-                <option value="electronics">3C 電子</option>
-                <option value="daily">生活用品</option>
-                <option value="clothing">服飾</option>
-                <option value="others">其他</option>
+            <label for="product-parent-category">主分類</label>
+            <select id="product-parent-category" name="parent_category" required>
+                <option value="">請選擇主分類</option>
+            </select>
+
+            <label for="product-subcategory">子分類</label>
+            <select id="product-subcategory" name="subcategory" required>
+                <option value="">請先選主分類</option>
             </select>
 
             <label for="product-image">商品圖片</label>

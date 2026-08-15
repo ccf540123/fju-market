@@ -17,15 +17,58 @@ function getCategoryName(category) {
   return categoryNames[category] || category || "未分類";
 }
 
+async function getCategoryDisplay(product) {
+  const categoryId = product && product.category_id ? product.category_id : null;
+
+  if (categoryId) {
+    const result = await supabaseClient
+      .from("categories")
+      .select("id, name, parent_id")
+      .eq("id", categoryId)
+      .maybeSingle();
+
+    if (result.data) {
+      const category = result.data;
+      if (category.parent_id) {
+        const parentResult = await supabaseClient
+          .from("categories")
+          .select("name")
+          .eq("id", category.parent_id)
+          .maybeSingle();
+
+        return {
+          parentName: parentResult.data ? parentResult.data.name : "主分類",
+          childName: category.name,
+          fullName: (parentResult.data ? parentResult.data.name : "主分類") + " / " + category.name,
+        };
+      }
+
+      return {
+        parentName: category.name,
+        childName: "",
+        fullName: category.name,
+      };
+    }
+  }
+
+  return {
+    parentName: product && product.category ? getCategoryName(product.category) : "未分類",
+    childName: "",
+    fullName: product && product.category ? getCategoryName(product.category) : "未分類",
+  };
+}
+
 function showError(text) {
   statusEl.textContent = text;
   detailEl.classList.add("hidden");
 }
 
-function showProduct(product, sellerProfile) {
+async function showProduct(product, sellerProfile) {
   statusEl.classList.add("hidden");
   detailEl.classList.remove("hidden");
   detailEl.textContent = "";
+
+  const categoryInfo = await getCategoryDisplay(product);
 
   const img = document.createElement("img");
   img.src = product.image || "https://placehold.co/400x400/f0f0f0/666666?text=商品";
@@ -53,7 +96,7 @@ function showProduct(product, sellerProfile) {
     sellerLine.appendChild(document.createTextNode("賣家："));
     const sellerLink = document.createElement("a");
     sellerLink.className = "seller-link";
-    sellerLink.href = "seller.html?id=" + product.seller_id;
+    sellerLink.href = "seller.html?id=" + product.seller_id + "&productId=" + product.id;
     sellerLink.textContent = sellerName + "（查看檔案）";
     sellerLine.appendChild(sellerLink);
   } else {
@@ -62,7 +105,7 @@ function showProduct(product, sellerProfile) {
 
   const category = document.createElement("p");
   category.className = "product-meta";
-  category.textContent = "分類：" + getCategoryName(product.category);
+  category.textContent = "分類：" + categoryInfo.fullName;
 
   info.appendChild(title);
   info.appendChild(price);
@@ -74,6 +117,74 @@ function showProduct(product, sellerProfile) {
     desc.className = "product-desc";
     desc.textContent = product.descirption;
     info.appendChild(desc);
+  }
+
+  if (product.seller_id) {
+    const contactBtn = document.createElement("button");
+    contactBtn.type = "button";
+    contactBtn.className = "contact-btn";
+    contactBtn.textContent = "聯絡賣家";
+    info.appendChild(contactBtn);
+
+    contactBtn.addEventListener("click", async function () {
+      const userResult = await supabaseClient.auth.getUser();
+      const user = userResult.data.user;
+
+      if (!user) {
+        alert("請先登入");
+        window.location.href = "login.html";
+        return;
+      }
+
+      if (user.id === product.seller_id) {
+        alert("這是你自己的商品");
+        return;
+      }
+
+      contactBtn.disabled = true;
+      contactBtn.textContent = "開啟聊天中...";
+
+      const existing = await supabaseClient
+        .from("conversations")
+        .select("id")
+        .eq("product_id", product.id)
+        .eq("buyer_id", user.id)
+        .eq("seller_id", product.seller_id)
+        .maybeSingle();
+
+      if (existing.error) {
+        console.error(existing.error);
+        alert("無法開啟聊天，請稍後再試");
+        contactBtn.disabled = false;
+        contactBtn.textContent = "聯絡賣家";
+        return;
+      }
+
+      if (existing.data) {
+        window.location.href = "chat.html?id=" + existing.data.id;
+        return;
+      }
+
+      const created = await supabaseClient
+        .from("conversations")
+        .insert({
+          product_id: product.id,
+          buyer_id: user.id,
+          seller_id: product.seller_id,
+        })
+        .select("id")
+        .single();
+
+      if (created.error) {
+        console.error(created.error);
+        alert("無法開啟聊天，請稍後再試");
+        contactBtn.disabled = false;
+        contactBtn.textContent = "聯絡賣家";
+        return;
+      }
+
+      window.location.href = "chat.html?id=" + created.data.id;
+    });
   }
 
   detailEl.appendChild(img);
