@@ -112,10 +112,16 @@ async function showProduct(product, sellerProfile) {
   info.appendChild(sellerLine);
   info.appendChild(category);
 
-  if (product.descirption) {
+  // 新欄位 description；舊資料可能還在拼錯的 descirption
+  const descriptionText =
+    (product.description && String(product.description).trim()) ||
+    (product.descirption && String(product.descirption).trim()) ||
+    "";
+
+  if (descriptionText) {
     const desc = document.createElement("p");
     desc.className = "product-desc";
-    desc.textContent = product.descirption;
+    desc.textContent = descriptionText;
     info.appendChild(desc);
   }
 

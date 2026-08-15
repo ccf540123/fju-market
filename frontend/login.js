@@ -17,12 +17,42 @@ function setMessage(text, type = "") {
 
 function getAuthErrorMessage(error) {
   const text = (error && error.message) || "";
+  const lower = text.toLowerCase();
 
-  if (text.toLowerCase().indexOf("invalid login credentials") !== -1) {
+  if (lower.indexOf("invalid login credentials") !== -1) {
     return "密碼錯誤";
   }
 
+  if (
+    lower.indexOf("already registered") !== -1 ||
+    lower.indexOf("user already registered") !== -1 ||
+    lower.indexOf("user already exists") !== -1 ||
+    (error && error.code === "user_already_exists")
+  ) {
+    return "此信箱已經註冊，請直接登入";
+  }
+
   return text;
+}
+
+// Supabase 在開啟「確認信箱」時，已註冊 email 可能不會回傳 error，
+// 而是回傳 user.identities 為空陣列（避免洩漏帳號是否存在的細節給攻擊者）。
+function isExistingEmailSignUp(result) {
+  if (result.error) {
+    const message = getAuthErrorMessage(result.error);
+    return message === "此信箱已經註冊，請直接登入";
+  }
+
+  const user = result.data && result.data.user;
+  if (
+    user &&
+    Array.isArray(user.identities) &&
+    user.identities.length === 0
+  ) {
+    return true;
+  }
+
+  return false;
 }
 
 function goToHome() {
@@ -79,6 +109,11 @@ form.addEventListener("submit", async (event) => {
         email: email,
         password: password,
       });
+
+      if (isExistingEmailSignUp(result)) {
+        setMessage("此信箱已經註冊，請直接登入");
+        return;
+      }
 
       if (result.error) {
         setMessage(getAuthErrorMessage(result.error));

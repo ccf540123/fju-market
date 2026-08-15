@@ -264,6 +264,10 @@ function createProductCard(product) {
   img.src = product.image || "https://placehold.co/400x400/f0f0f0/666666?text=商品";
   img.alt = product.title;
 
+  const media = document.createElement("div");
+  media.className = "product-card-media";
+  media.appendChild(img);
+
   const info = document.createElement("div");
   info.className = "product-info";
 
@@ -298,7 +302,7 @@ function createProductCard(product) {
   info.appendChild(price);
   info.appendChild(favoriteBtn);
 
-  card.appendChild(img);
+  card.appendChild(media);
   card.appendChild(info);
 
   favoriteBtn.addEventListener("click", async function (event) {
@@ -564,6 +568,7 @@ publishForm.addEventListener("submit", async function (event) {
 
   const title = document.getElementById("product-title").value.trim();
   const price = Number(document.getElementById("product-price").value);
+  const description = document.getElementById("product-description").value.trim();
   const parentCategoryId = parentCategorySelect.value;
   const subcategoryId = subcategorySelect.value;
   const imageFile = document.getElementById("product-image").files[0];
@@ -637,6 +642,7 @@ publishForm.addEventListener("submit", async function (event) {
     seller_id: currentUser.id,
     category_id: Number(subcategoryId),
     category: selectedSubcategory ? selectedSubcategory.name : "未分類",
+    description: description || null,
     image: imageUrl,
   });
 

@@ -15,6 +15,10 @@ function createFavoriteCard(product) {
   img.src = product.image || "https://placehold.co/400x400/f0f0f0/666666?text=商品";
   img.alt = product.title;
 
+  const media = document.createElement("div");
+  media.className = "product-card-media";
+  media.appendChild(img);
+
   const info = document.createElement("div");
   info.className = "product-info";
 
@@ -40,7 +44,7 @@ function createFavoriteCard(product) {
   info.appendChild(price);
   info.appendChild(removeBtn);
 
-  card.appendChild(img);
+  card.appendChild(media);
   card.appendChild(info);
 
   removeBtn.addEventListener("click", async function (event) {

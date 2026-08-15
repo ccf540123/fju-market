@@ -13,6 +13,10 @@ function createMyProductCard(product) {
   img.src = product.image || "https://placehold.co/400x400/f0f0f0/666666?text=商品";
   img.alt = product.title;
 
+  const media = document.createElement("div");
+  media.className = "product-card-media";
+  media.appendChild(img);
+
   const info = document.createElement("div");
   info.className = "product-info";
 
@@ -39,7 +43,7 @@ function createMyProductCard(product) {
   info.appendChild(price);
   info.appendChild(deleteBtn);
 
-  card.appendChild(img);
+  card.appendChild(media);
   card.appendChild(info);
 
   deleteBtn.addEventListener("click", async function (event) {
