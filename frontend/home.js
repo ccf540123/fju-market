@@ -39,6 +39,7 @@ let currentCategory = "all";
 let currentSubcategory = "all";
 let currentSearch = "";
 let currentSort = "newest";
+let isPublishing = false;
 
 function getCategoryById(categoryId) {
   if (!categoryId) {
@@ -200,14 +201,14 @@ function renderPublishCategoryOptions() {
       })
       .join("");
 
+  // 不要用 disabled：瀏覽器遇到 required + disabled 時，
+  // 按發布常常沒反應（無法顯示驗證提示）
   subcategorySelect.innerHTML = '<option value="">請先選主分類</option>';
-  subcategorySelect.disabled = true;
 }
 
 function updatePublishSubcategoryOptions(parentId) {
   if (!parentId) {
     subcategorySelect.innerHTML = '<option value="">請先選主分類</option>';
-    subcategorySelect.disabled = true;
     return;
   }
 
@@ -215,7 +216,6 @@ function updatePublishSubcategoryOptions(parentId) {
 
   if (!children.length) {
     subcategorySelect.innerHTML = '<option value="">此主分類沒有子分類</option>';
-    subcategorySelect.disabled = true;
     return;
   }
 
@@ -232,7 +232,6 @@ function updatePublishSubcategoryOptions(parentId) {
         );
       })
       .join("");
-  subcategorySelect.disabled = false;
 }
 
 function updateActiveButtons() {
@@ -506,6 +505,11 @@ sortSelect.addEventListener("change", function () {
 
 function openPublishModal() {
   publishMessage.textContent = "";
+  renderPublishCategoryOptions();
+  updatePublishSubcategoryOptions("");
+  if (!parentCategories.length) {
+    publishMessage.textContent = "分類尚未載入，請重新整理頁面後再試";
+  }
   publishModal.classList.remove("hidden");
 }
 
@@ -553,6 +557,10 @@ cancelPublishBtn.addEventListener("click", function () {
 publishForm.addEventListener("submit", async function (event) {
   event.preventDefault();
 
+  if (isPublishing) {
+    return;
+  }
+
   if (!requireLogin()) {
     return;
   }
@@ -568,8 +576,18 @@ publishForm.addEventListener("submit", async function (event) {
     return;
   }
 
-  if (!parentCategoryId || !subcategoryId) {
-    publishMessage.textContent = "請選擇分類";
+  if (!parentCategoryId) {
+    publishMessage.textContent = "請選擇主分類";
+    return;
+  }
+
+  if (!subcategoryId) {
+    publishMessage.textContent = "請選擇子分類";
+    return;
+  }
+
+  if (!getCategoryById(subcategoryId)) {
+    publishMessage.textContent = "分類資料載入失敗，請重新整理頁面後再試";
     return;
   }
 
@@ -577,6 +595,8 @@ publishForm.addEventListener("submit", async function (event) {
     publishMessage.textContent = "請上傳商品圖片";
     return;
   }
+
+  isPublishing = true;
 
   const profileResult = await supabaseClient
     .from("profiles")
@@ -599,7 +619,9 @@ publishForm.addEventListener("submit", async function (event) {
 
   if (uploadResult.error) {
     console.error(uploadResult.error);
-    publishMessage.textContent = "圖片上傳失敗，請稍後再試";
+    publishMessage.textContent =
+      "圖片上傳失敗：" + (uploadResult.error.message || "請稍後再試");
+    isPublishing = false;
     return;
   }
 
@@ -609,7 +631,6 @@ publishForm.addEventListener("submit", async function (event) {
 
   const imageUrl = publicUrlResult.data.publicUrl;
   const selectedSubcategory = getCategoryById(subcategoryId);
-  const selectedParent = getCategoryById(parentCategoryId);
 
   // 新商品以 category_id（子分類）為準；文字 category 只當相容備援
   const result = await supabaseClient.from("products").insert({
@@ -618,20 +639,19 @@ publishForm.addEventListener("submit", async function (event) {
     seller: sellerName,
     seller_id: currentUser.id,
     category_id: Number(subcategoryId),
-    category: selectedSubcategory
-      ? selectedSubcategory.name
-      : selectedParent
-        ? selectedParent.name
-        : "未分類",
+    category: selectedSubcategory ? selectedSubcategory.name : "未分類",
     image: imageUrl,
   });
 
   if (result.error) {
     console.error(result.error);
-    publishMessage.textContent = "發布失敗，請稍後再試";
+    publishMessage.textContent =
+      "發布失敗：" + (result.error.message || "請稍後再試");
+    isPublishing = false;
     return;
   }
 
+  isPublishing = false;
   closePublishModal();
   loadProducts();
 });
