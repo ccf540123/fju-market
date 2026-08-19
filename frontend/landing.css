@@ -106,6 +106,43 @@ body {
   border-color: #ccc;
 }
 
+.feedback-section {
+  width: min(420px, 100%);
+  margin: 40px auto 0;
+  padding: 0;
+  text-align: center;
+}
+
+.feedback-title {
+  margin: 0 0 10px;
+  color: #222;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.feedback-text {
+  margin: 0 0 16px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+.feedback-btn {
+  display: inline-block;
+  padding: 10px 18px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  color: #222;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.feedback-btn:hover {
+  background: #f0f0f0;
+}
+
 .feature-list {
   width: min(420px, 100%);
   margin: 40px auto 0;
@@ -132,6 +169,13 @@ body {
   margin: 8px 0 0;
   color: #777;
   font-size: 14px;
+}
+footer{
+  opacity: 0.5;
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+  color: #777;
 }
 
 @media (max-width: 720px) {
