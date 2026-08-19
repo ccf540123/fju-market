@@ -16,7 +16,25 @@ body {
   padding: 0 0 80px;
 }
 
-/* App 風格返回鍵：固定疊在圖片左上角 */
+/* 列表頁（我的商品／收藏／訊息／聊天） */
+.product-page--list {
+  padding: 64px 16px 80px;
+}
+
+.product-page--list .list-title {
+  margin: 0 0 12px;
+  color: #111;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.product-page--list .product-status {
+  margin: 0 0 16px;
+  padding: 0;
+  text-align: left;
+}
+
+/* App 風格返回鍵 */
 .product-back-btn {
   position: fixed;
   top: 14px;
