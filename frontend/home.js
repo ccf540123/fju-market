@@ -279,10 +279,6 @@ function createProductCard(product) {
   title.className = "product-title";
   title.textContent = product.title;
 
-  const category = document.createElement("p");
-  category.className = "product-category";
-  category.textContent = getProductCategoryContext(product).label;
-
   const price = document.createElement("p");
   price.className = "product-price";
   price.textContent = formatPrice(product.price || 0);
@@ -298,7 +294,6 @@ function createProductCard(product) {
 
   info.appendChild(seller);
   info.appendChild(title);
-  info.appendChild(category);
   info.appendChild(price);
   info.appendChild(favoriteBtn);
 

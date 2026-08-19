@@ -1,61 +1,8 @@
 const statusEl = document.getElementById("product-status");
 const detailEl = document.getElementById("product-detail");
 
-const categoryNames = {
-  books: "書籍",
-  electronics: "3C 電子",
-  daily: "生活用品",
-  clothing: "服飾",
-  others: "其他",
-};
-
 function formatPrice(price) {
   return "NT$" + Number(price).toLocaleString("zh-TW");
-}
-
-function getCategoryName(category) {
-  return categoryNames[category] || category || "未分類";
-}
-
-async function getCategoryDisplay(product) {
-  const categoryId = product && product.category_id ? product.category_id : null;
-
-  if (categoryId) {
-    const result = await supabaseClient
-      .from("categories")
-      .select("id, name, parent_id")
-      .eq("id", categoryId)
-      .maybeSingle();
-
-    if (result.data) {
-      const category = result.data;
-      if (category.parent_id) {
-        const parentResult = await supabaseClient
-          .from("categories")
-          .select("name")
-          .eq("id", category.parent_id)
-          .maybeSingle();
-
-        return {
-          parentName: parentResult.data ? parentResult.data.name : "主分類",
-          childName: category.name,
-          fullName: (parentResult.data ? parentResult.data.name : "主分類") + " / " + category.name,
-        };
-      }
-
-      return {
-        parentName: category.name,
-        childName: "",
-        fullName: category.name,
-      };
-    }
-  }
-
-  return {
-    parentName: product && product.category ? getCategoryName(product.category) : "未分類",
-    childName: "",
-    fullName: product && product.category ? getCategoryName(product.category) : "未分類",
-  };
 }
 
 function showError(text) {
@@ -68,11 +15,13 @@ async function showProduct(product, sellerProfile) {
   detailEl.classList.remove("hidden");
   detailEl.textContent = "";
 
-  const categoryInfo = await getCategoryDisplay(product);
-
   const img = document.createElement("img");
   img.src = product.image || "https://placehold.co/400x400/f0f0f0/666666?text=商品";
   img.alt = product.title || "商品圖片";
+
+  const media = document.createElement("div");
+  media.className = "product-detail-media";
+  media.appendChild(img);
 
   const info = document.createElement("div");
   info.className = "product-detail-info";
@@ -103,14 +52,9 @@ async function showProduct(product, sellerProfile) {
     sellerLine.textContent = "賣家：" + sellerName;
   }
 
-  const category = document.createElement("p");
-  category.className = "product-meta";
-  category.textContent = "分類：" + categoryInfo.fullName;
-
   info.appendChild(title);
   info.appendChild(price);
   info.appendChild(sellerLine);
-  info.appendChild(category);
 
   // 新欄位 description；舊資料可能還在拼錯的 descirption
   const descriptionText =
@@ -193,7 +137,7 @@ async function showProduct(product, sellerProfile) {
     });
   }
 
-  detailEl.appendChild(img);
+  detailEl.appendChild(media);
   detailEl.appendChild(info);
 }
 
