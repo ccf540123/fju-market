@@ -56,7 +56,14 @@
 
     <div class="page-layout">
         <!-- 左側分類篩選：點主分類後，子分類嵌在該項目下方 -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="category-sidebar">
+            <button type="button" id="category-toggle" class="category-toggle" aria-expanded="false">
+                <span class="category-toggle-text">
+                    <span class="category-toggle-label">分類</span>
+                    <span id="category-current" class="category-current">全部商品</span>
+                </span>
+                <span class="category-toggle-arrow" aria-hidden="true">▾</span>
+            </button>
             <h2 class="sidebar-title">商品分類</h2>
             <div class="category-cascade">
                 <ul class="category-list" id="category-list"></ul>

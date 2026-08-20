@@ -21,6 +21,9 @@ const drawer = document.getElementById("drawer");
 const drawerOverlay = document.getElementById("drawer-overlay");
 const drawerClose = document.getElementById("drawer-close");
 const categoryList = document.getElementById("category-list");
+const categorySidebar = document.getElementById("category-sidebar");
+const categoryToggle = document.getElementById("category-toggle");
+const categoryCurrent = document.getElementById("category-current");
 const parentCategorySelect = document.getElementById("product-parent-category");
 const subcategorySelect = document.getElementById("product-subcategory");
 const favoritesLinks = document.querySelectorAll('[data-nav="favorites"]');
@@ -174,6 +177,7 @@ function buildCategoryMenu() {
       currentSubcategory = button.dataset.subcategory;
       updateCategoryMenuState();
       renderProducts();
+      collapseCategoryPanel();
     });
   });
 }
@@ -202,6 +206,46 @@ function updateCategoryMenuState() {
       subBtn.classList.toggle("active", isActive);
     });
   });
+
+  updateCategoryToggleLabel();
+}
+
+function getCurrentCategoryLabel() {
+  if (currentCategory === "all") {
+    return "全部商品";
+  }
+
+  const parent = getCategoryById(currentCategory);
+  const parentName = parent ? parent.name : "商品分類";
+
+  if (currentSubcategory === "all") {
+    return parentName;
+  }
+
+  const child = getCategoryById(currentSubcategory);
+  if (child) {
+    return parentName + "／" + child.name;
+  }
+
+  return parentName;
+}
+
+function updateCategoryToggleLabel() {
+  if (categoryCurrent) {
+    categoryCurrent.textContent = getCurrentCategoryLabel();
+  }
+}
+
+// 手機版：選完分類後把清單收起來，畫面留給商品
+function collapseCategoryPanel() {
+  if (!categorySidebar) {
+    return;
+  }
+
+  categorySidebar.classList.remove("is-expanded");
+  if (categoryToggle) {
+    categoryToggle.setAttribute("aria-expanded", "false");
+  }
 }
 
 function renderCategoryMenu() {
@@ -273,6 +317,11 @@ function setCategory(category) {
 
   renderCategoryMenu();
   renderProducts();
+
+  // 選「全部商品」、或這個主分類沒有子分類時，手機版直接收合
+  if (currentCategory === "all" || getSubcategoriesForParent(currentCategory).length === 0) {
+    collapseCategoryPanel();
+  }
 }
 
 // 把價格加上千分位，例如 3852 → 3,852
@@ -764,6 +813,13 @@ drawerClose.addEventListener("click", function () {
 drawerOverlay.addEventListener("click", function () {
   closeDrawer();
 });
+
+if (categoryToggle) {
+  categoryToggle.addEventListener("click", function () {
+    const isOpen = categorySidebar.classList.toggle("is-expanded");
+    categoryToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  });
+}
 
 logoutBtn.addEventListener("click", async function () {
   await supabaseClient.auth.signOut();

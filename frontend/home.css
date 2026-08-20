@@ -139,6 +139,11 @@ body {
   font-weight: 700;
 }
 
+/* 手機才用的分類收合按鈕，電腦版隱藏 */
+.category-toggle {
+  display: none;
+}
+
 .category-cascade {
   display: flex;
   flex-direction: column;
@@ -657,8 +662,66 @@ body {
     max-width: 100%;
   }
 
-  .category-cascade {
+  .sidebar-title {
+    display: none;
+  }
+
+  .category-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    background: #fff;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .category-toggle-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .category-toggle-label {
+    color: #888;
+    font-size: 12px;
+  }
+
+  .category-current {
+    overflow: hidden;
+    color: #111;
+    font-size: 15px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .category-toggle-arrow {
+    flex-shrink: 0;
+    color: #888;
+    font-size: 12px;
+    transition: transform 0.2s ease;
+  }
+
+  .sidebar.is-expanded .category-toggle-arrow {
+    transform: rotate(180deg);
+  }
+
+  .category-cascade {
+    display: none;
+    width: 100%;
+    margin-top: 8px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .sidebar.is-expanded .category-cascade {
+    display: block;
   }
 
   /* 手機也維持直向嵌套展開 */
@@ -673,7 +736,7 @@ body {
   .category-btn {
     width: 100%;
     max-width: none;
-    padding: 14px 16px;
+    padding: 12px 14px;
     border: none;
     border-radius: 0;
     background: transparent;
@@ -687,7 +750,7 @@ body {
   .category-item .subcategory-btn {
     width: 100%;
     max-width: none;
-    padding: 13px 16px 13px 32px;
+    padding: 11px 14px 11px 28px;
     font-size: 14px;
     white-space: normal;
   }
