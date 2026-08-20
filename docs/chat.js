@@ -130,7 +130,7 @@ async function initChat() {
 
   if (!currentUser) {
     alert("請先登入");
-    window.location.href = "../login/";
+    window.location.href = "/login/";
     return;
   }
 

@@ -66,7 +66,7 @@ function createFavoriteCard(product) {
   });
 
   card.addEventListener("click", function () {
-    window.location.href = "../product/?id=" + product.id;
+    window.location.href = "/product/?id=" + product.id;
   });
 
   return card;
@@ -78,7 +78,7 @@ async function loadFavorites() {
 
   if (!currentUser) {
     alert("請先登入");
-    window.location.href = "../login/";
+    window.location.href = "/login/";
     return;
   }
 

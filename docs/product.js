@@ -45,7 +45,7 @@ async function showProduct(product, sellerProfile) {
     sellerLine.appendChild(document.createTextNode("賣家："));
     const sellerLink = document.createElement("a");
     sellerLink.className = "seller-link";
-    sellerLink.href = "../seller/?id=" + product.seller_id + "&productId=" + product.id;
+    sellerLink.href = "/seller/?id=" + product.seller_id + "&productId=" + product.id;
     sellerLink.textContent = sellerName + "（查看檔案）";
     sellerLine.appendChild(sellerLink);
   } else {
@@ -82,7 +82,7 @@ async function showProduct(product, sellerProfile) {
 
       if (!user) {
         alert("請先登入");
-        window.location.href = "../login/";
+        window.location.href = "/login/";
         return;
       }
 
@@ -111,7 +111,7 @@ async function showProduct(product, sellerProfile) {
       }
 
       if (existing.data) {
-        window.location.href = "../chat/?id=" + existing.data.id;
+        window.location.href = "/chat/?id=" + existing.data.id;
         return;
       }
 
@@ -133,7 +133,7 @@ async function showProduct(product, sellerProfile) {
         return;
       }
 
-      window.location.href = "../chat/?id=" + created.data.id;
+      window.location.href = "/chat/?id=" + created.data.id;
     });
   }
 

@@ -84,7 +84,7 @@ function isExistingEmailSignUp(result) {
 }
 
 function goToHome() {
-  window.location.href = "../home/";
+  window.location.href = "/home/";
 }
 
 function switchMode(nextMode) {
@@ -187,7 +187,7 @@ forgotBtn.addEventListener("click", async function () {
   forgotBtn.disabled = true;
   setMessage("寄送重設信件中...");
 
-  const redirectTo = new URL("../reset-password/", window.location.href).href;
+  const redirectTo = window.location.origin + "/reset-password/";
   const result = await supabaseClient.auth.resetPasswordForEmail(email, {
     redirectTo: redirectTo,
   });
