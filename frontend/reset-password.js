@@ -65,5 +65,5 @@ form.addEventListener("submit", async function (event) {
   }
 
   setMessage("密碼已更新，請重新登入", "success");
-  window.location.href = "login.html";
+  window.location.href = "../login/";
 });

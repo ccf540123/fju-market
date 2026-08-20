@@ -432,7 +432,7 @@ function createProductCard(product) {
   });
 
   card.addEventListener("click", function () {
-    window.location.href = "product.html?id=" + product.id;
+    window.location.href = "../product/?id=" + product.id;
   });
 
   return card;
@@ -610,7 +610,7 @@ function requireLogin() {
   }
 
   alert("請先登入");
-  window.location.href = "login.html";
+  window.location.href = "../login/";
   return false;
 }
 
@@ -621,7 +621,7 @@ function requireLoginOrStay(event) {
 
   event.preventDefault();
   alert("請先登入");
-  window.location.href = "login.html";
+  window.location.href = "../login/";
   return false;
 }
 
@@ -849,5 +849,5 @@ window.addEventListener("resize", updateCompactCategoryMode);
 
 logoutBtn.addEventListener("click", async function () {
   await supabaseClient.auth.signOut();
-  window.location.href = "login.html";
+  window.location.href = "../login/";
 });

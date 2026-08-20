@@ -4,4 +4,4 @@
 
 ## 🌐 網站
 
-👉 [進入網站](https://ccf540123.github.io/fju-market/frontend/landing.html)
+👉 [進入網站](https://www.wayfloo.com/)

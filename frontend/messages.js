@@ -49,7 +49,7 @@ function createConversationCard(conversation, currentUserId, profileById, lastMe
 
   const link = document.createElement("a");
   link.className = "conversation-item";
-  link.href = "chat.html?id=" + conversation.id;
+  link.href = "../chat/?id=" + conversation.id;
 
   const avatar = document.createElement("img");
   avatar.className = "conversation-avatar";
@@ -97,7 +97,7 @@ async function loadConversations() {
 
   if (!user) {
     alert("請先登入");
-    window.location.href = "login.html";
+    window.location.href = "../login/";
     return;
   }
 

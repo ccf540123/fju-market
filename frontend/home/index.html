@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="="../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="="../home.css?v=5">
+    <title>商品瀏覽｜輔大二手交易平台</title>
+</head>
+<body>
+    <!-- 上方導覽列：Logo + 搜尋 -->
+    <header class="site-header">
+        <div class="header-inner">
+            <button type="button" id="menu-btn" class="menu-btn" aria-label="開啟選單">☰</button>
+            <span class="logo">輔大二手市集</span>
+
+            <nav class="header-nav">
+                <a href="="../favorites/" data-nav="favorites">我的收藏</a>
+                <a href="="../messages/" data-nav="messages">我的訊息</a>
+                <a href="="../my-products/" data-nav="my-products">我的商品</a>
+                <a href="="../profile/" data-nav="profile">編輯個人檔案</a>
+            </nav>
+
+            <div class="header-search">
+                <input
+                    type="search"
+                    class="search-input"
+                    placeholder="搜尋商品"
+                >
+            </div>
+
+            <div class="header-auth">
+                <a href="="../login/" id="login-link">登入</a>
+                <span id="user-area" class="user-area hidden">
+                    <img id="current-user" class="current-user-avatar" alt="使用者頭像" src="https://placehold.co/36x36/f0f0f0/666666?text=頭像">
+                    <span id="current-user-name" class="current-user-name"></span>
+                    <button type="button" id="logout-btn">登出</button>
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <div id="drawer-overlay" class="drawer-overlay"></div>
+    <aside id="drawer" class="drawer">
+        <div class="drawer-header">
+            <span>選單</span>
+            <button type="button" id="drawer-close" class="drawer-close" aria-label="關閉選單">✕</button>
+        </div>
+        <nav class="drawer-nav">
+            <a href="="../favorites/" data-nav="favorites">我的收藏</a>
+            <a href="="../messages/" data-nav="messages">我的訊息</a>
+            <a href="="../my-products/" data-nav="my-products">我的商品</a>
+            <a href="="../profile/" data-nav="profile">編輯個人檔案</a>
+        </nav>
+    </aside>
+
+    <div class="page-layout">
+        <!-- 左側分類篩選：點主分類後，子分類嵌在該項目下方 -->
+        <aside class="sidebar" id="category-sidebar">
+            <button type="button" id="category-toggle" class="category-toggle" aria-expanded="false">
+                <span class="category-toggle-text">
+                    <span class="category-toggle-label">分類</span>
+                    <span id="category-current" class="category-current">全部商品</span>
+                </span>
+                <span class="category-toggle-arrow" aria-hidden="true">▾</span>
+            </button>
+            <h2 class="sidebar-title">商品分類</h2>
+            <div class="category-cascade">
+                <ul class="category-list" id="category-list"></ul>
+            </div>
+        </aside>
+
+        <!-- 右側商品區 -->
+        <main class="main-content">
+            <div class="page-search">
+                <input
+                    type="search"
+                    class="search-input"
+                    placeholder="搜尋商品"
+                >
+            </div>
+
+            <!-- 商品列表標題列 -->
+            <div class="list-header">
+                <div class="list-header-left">
+                    <h1 class="list-title">分類商品</h1>
+                    <p class="list-count">共 <span id="product-count">0</span> 件商品</p>
+                </div>
+                <label class="sort-label">
+                    排序
+                    <select id="sort-select">
+                        <option value="newest">最新上架</option>
+                        <option value="price-asc">價格由低到高</option>
+                        <option value="price-desc">價格由高到低</option>
+                    </select>
+                </label>
+            </div>
+
+            <!-- 商品卡片網格 -->
+            <div id="product-list" class="product-grid"></div>
+            <p id="empty-message" class="empty-message hidden">找不到符合的商品</p>
+        </main>
+    </div>
+
+    <!-- 發布商品按鈕 -->
+    <button type="button" id="publish-btn" class="publish-btn">＋ 發布商品</button>
+
+    <div id="publish-modal" class="publish-modal hidden">
+        <form id="publish-form" class="publish-form">
+            <h2>發布商品</h2>
+
+            <label for="product-title">商品名稱</label>
+            <input type="text" id="product-title" name="title" required>
+
+            <label for="product-price">價格</label>
+            <input type="number" id="product-price" name="price" min="0" required>
+
+            <label for="product-parent-category">主分類</label>
+            <select id="product-parent-category" name="parent_category">
+                <option value="">請選擇主分類</option>
+            </select>
+
+            <label for="product-subcategory">子分類</label>
+            <select id="product-subcategory" name="subcategory">
+                <option value="">請先選主分類</option>
+            </select>
+
+            <label for="product-description">商品說明（選填）</label>
+            <textarea
+                id="product-description"
+                name="description"
+                rows="4"
+                placeholder="可寫使用狀況、面交地點、注意事項…"
+            ></textarea>
+
+            <label for="product-image">商品圖片</label>
+            <input
+                type="file"
+                id="product-image"
+                name="image"
+                accept="image/*"
+                required
+            >
+            <p class="form-hint">手機可從相簿選照片，或直接拍照</p>
+
+            <p id="publish-message" class="publish-message"></p>
+
+            <div class="publish-actions">
+                <button type="button" id="cancel-publish-btn">取消</button>
+                <button type="submit">發布</button>
+            </div>
+        </form>
+    </div>
+   
+    <!-- Supabase 官方函式庫（CDN） -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="="../supabase-config.js"></script>
+    <script src="="../home.js?v=5"></script>
+</body>
+</html>

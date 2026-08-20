@@ -11,10 +11,10 @@ async function loadSeller() {
   const backLink = document.getElementById("back-link");
 
   if (productId) {
-    backLink.href = "product.html?id=" + productId;
+    backLink.href = "../product/?id=" + productId;
     backLink.textContent = "← 返回商品";
   } else {
-    backLink.href = "home.html";
+    backLink.href = "../home/";
     backLink.textContent = "← 返回商品列表";
   }
 
