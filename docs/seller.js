@@ -38,7 +38,7 @@ async function loadSeller() {
   const profile = result.data;
   const name = profile.display_name || "未設定姓名";
 
-  document.title = name + "｜輔大二手交易平台";
+  document.title = name + "｜WAYFLOO";
   nameEl.textContent = name;
   departmentEl.textContent = profile.department || "未填寫";
   avatarEl.src =

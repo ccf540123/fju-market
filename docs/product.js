@@ -163,7 +163,7 @@ async function loadProduct() {
     return;
   }
 
-  document.title = result.data.title + "｜輔大二手交易平台";
+  document.title = result.data.title + "｜WAYFLOO";
 
   let sellerProfile = null;
   if (result.data.seller_id) {
