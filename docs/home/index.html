@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="/home.css?v=6">
+    <link rel="stylesheet" href="/home.css?v=7">
     <title>商品瀏覽｜WAYFLOO</title>
 </head>
 <body>
@@ -120,7 +120,7 @@
                 <option value="">請選擇主分類</option>
             </select>
 
-            <label for="product-subcategory">子分類</label>
+            <label for="product-subcategory">子分類（選填）</label>
             <select id="product-subcategory" name="subcategory">
                 <option value="">請先選主分類</option>
             </select>
@@ -133,15 +133,20 @@
                 placeholder="可寫使用狀況、面交地點、注意事項…"
             ></textarea>
 
-            <label for="product-image">商品圖片</label>
-            <input
-                type="file"
-                id="product-image"
-                name="image"
-                accept="image/*"
-                required
-            >
-            <p class="form-hint">手機可從相簿選照片，或直接拍照</p>
+            <span class="form-label-text">商品圖片</span>
+            <label class="file-picker" for="product-image">
+                <input
+                    type="file"
+                    id="product-image"
+                    name="image"
+                    class="file-picker-input"
+                    accept="image/*"
+                    required
+                >
+                <span class="file-picker-btn">選擇照片</span>
+                <span id="product-image-name" class="file-picker-name">尚未選擇照片</span>
+            </label>
+            <p class="form-hint">目前最多上傳 1 張照片，可從相簿選或直接拍照</p>
 
             <p id="publish-message" class="publish-message"></p>
 
@@ -155,6 +160,6 @@
     <!-- Supabase 官方函式庫（CDN） -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/supabase-config.js"></script>
-    <script src="/home.js?v=6"></script>
+    <script src="/home.js?v=7"></script>
 </body>
 </html>

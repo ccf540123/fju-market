@@ -559,7 +559,8 @@ body.is-compact-category .sidebar.is-expanded .category-cascade {
   font-size: 20px;
 }
 
-.publish-form label {
+.publish-form label,
+.publish-form .form-label-text {
   display: block;
   margin: 10px 0 6px;
   font-size: 14px;
@@ -587,6 +588,51 @@ body.is-compact-category .sidebar.is-expanded .category-cascade {
   padding: 8px 0;
   border: none;
   background: transparent;
+}
+
+.publish-form .file-picker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.file-picker-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.file-picker-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #222;
+  font-size: 14px;
+}
+
+.file-picker:hover .file-picker-btn {
+  background: #f7f7f7;
+}
+
+.file-picker-name {
+  min-width: 0;
+  overflow: hidden;
+  color: #666;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .form-hint {
@@ -792,6 +838,17 @@ body.is-compact-category .sidebar.is-expanded .category-cascade {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+  }
+
+  .publish-form .file-picker {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .file-picker-btn {
+    width: 100%;
+    padding: 12px 16px;
   }
 
   .product-grid {
