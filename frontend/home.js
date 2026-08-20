@@ -109,33 +109,28 @@ function getSubcategoriesForParent(parentId) {
   return subcategoriesByParent.get(String(parentId)) || [];
 }
 
-function renderCategoryMenu() {
+// 第一次建立分類選單的 HTML（子分類先都放進 DOM，之後用 class 控制展開）
+function buildCategoryMenu() {
   const items = [
-    '<li class="category-item">' +
-      '<button type="button" class="category-btn' +
-      (currentCategory === "all" ? " active" : "") +
-      '" data-category="all"><span>全部商品</span></button>' +
+    '<li class="category-item" data-category-item="all">' +
+      '<button type="button" class="category-btn" data-category="all">' +
+      "<span>全部商品</span></button>" +
       "</li>",
   ];
 
   parentCategories.forEach(function (category) {
     const parentId = String(category.id);
-    const isOpen = String(currentCategory) === parentId;
     const children = getSubcategoriesForParent(parentId);
     const hasChildren = children.length > 0;
     const arrowHtml = hasChildren
-      ? '<span class="category-arrow" aria-hidden="true">' +
-        (isOpen ? "˅" : "›") +
-        "</span>"
+      ? '<span class="category-arrow" aria-hidden="true">›</span>'
       : "";
 
     let html =
-      '<li class="category-item' +
-      (isOpen ? " is-open" : "") +
+      '<li class="category-item" data-category-item="' +
+      parentId +
       '">' +
-      '<button type="button" class="category-btn' +
-      (isOpen ? " active" : "") +
-      '" data-category="' +
+      '<button type="button" class="category-btn" data-category="' +
       parentId +
       '"><span>' +
       category.name +
@@ -143,20 +138,16 @@ function renderCategoryMenu() {
       arrowHtml +
       "</button>";
 
-    // 只有目前選到的主分類，才在該項目下方展開子分類
-    if (isOpen && hasChildren) {
+    // 子分類一直放在 DOM 裡，收合時用 CSS 藏起來，才能做展開動畫
+    if (hasChildren) {
       html += '<ul class="subcategory-list">';
       html +=
-        '<li><button type="button" class="subcategory-btn' +
-        (currentSubcategory === "all" ? " active" : "") +
-        '" data-subcategory="all"><span>全部</span></button></li>';
+        '<li><button type="button" class="subcategory-btn" data-subcategory="all">' +
+        "<span>全部</span></button></li>";
 
       children.forEach(function (child) {
-        const isActive = String(currentSubcategory) === String(child.id);
         html +=
-          '<li><button type="button" class="subcategory-btn' +
-          (isActive ? " active" : "") +
-          '" data-subcategory="' +
+          '<li><button type="button" class="subcategory-btn" data-subcategory="' +
           String(child.id) +
           '"><span>' +
           child.name +
@@ -181,10 +172,45 @@ function renderCategoryMenu() {
   categoryList.querySelectorAll(".subcategory-btn").forEach(function (button) {
     button.addEventListener("click", function () {
       currentSubcategory = button.dataset.subcategory;
-      renderCategoryMenu();
+      updateCategoryMenuState();
       renderProducts();
     });
   });
+}
+
+// 只改 class，不要重畫 HTML，展開／收合動畫才不會被打斷
+function updateCategoryMenuState() {
+  categoryList.querySelectorAll(".category-item").forEach(function (item) {
+    const itemId = item.dataset.categoryItem;
+    const isAll = itemId === "all";
+    const isOpen = !isAll && String(currentCategory) === String(itemId);
+    const btn = item.querySelector(".category-btn");
+
+    item.classList.toggle("is-open", isOpen);
+
+    if (btn) {
+      if (isAll) {
+        btn.classList.toggle("active", currentCategory === "all");
+      } else {
+        btn.classList.toggle("active", isOpen);
+      }
+    }
+
+    item.querySelectorAll(".subcategory-btn").forEach(function (subBtn) {
+      const isActive =
+        isOpen && String(currentSubcategory) === String(subBtn.dataset.subcategory);
+      subBtn.classList.toggle("active", isActive);
+    });
+  });
+}
+
+function renderCategoryMenu() {
+  // 還沒建過選單 → 先建立；之後只更新狀態
+  if (!categoryList.dataset.built) {
+    buildCategoryMenu();
+    categoryList.dataset.built = "true";
+  }
+  updateCategoryMenuState();
 }
 
 function renderPublishCategoryOptions() {

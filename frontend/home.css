@@ -174,6 +174,7 @@ body {
   font-size: 14px;
   text-align: left;
   cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .category-btn:hover {
@@ -187,23 +188,42 @@ body {
 }
 
 .category-btn .category-arrow {
+  display: inline-block;
   color: #999;
   font-size: 12px;
   line-height: 1;
+  transition: transform 0.25s ease, color 0.2s ease;
 }
 
 .category-btn.active .category-arrow {
   color: #111;
 }
 
-/* 子分類嵌在主分類項目下方 */
+.category-item.is-open .category-arrow {
+  transform: rotate(90deg);
+}
+
+/* 子分類嵌在主分類項目下方：預設收合，展開時滑出 */
 .category-item .subcategory-list {
   display: block;
   list-style: none;
   margin: 0;
   padding: 0;
-  border-top: 1px solid #eee;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  border-top: 0 solid #eee;
   background: #fafafa;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.22s ease,
+    border-top-width 0.2s ease;
+}
+
+.category-item.is-open .subcategory-list {
+  max-height: 800px;
+  opacity: 1;
+  border-top-width: 1px;
 }
 
 .category-item .subcategory-list li {
@@ -227,6 +247,7 @@ body {
   font-size: 13px;
   text-align: left;
   cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .category-item .subcategory-btn:hover {
@@ -237,6 +258,15 @@ body {
   background: #ececec;
   color: #111;
   font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-btn,
+  .category-btn .category-arrow,
+  .category-item .subcategory-list,
+  .category-item .subcategory-btn {
+    transition: none;
+  }
 }
 
 /* ========== 右側內容 ========== */
