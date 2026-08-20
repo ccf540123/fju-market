@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="landing.css">
     <link rel="stylesheet" href="login.css">
     <title>登入｜輔大二手交易平台</title>
@@ -38,26 +39,54 @@
                 >
 
                 <label for="password">密碼</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="至少 8 個字元"
-                    autocomplete="current-password"
-                    minlength="8"
-                    required
-                >
+                <div class="password-field">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="至少 8 個字元"
+                        autocomplete="current-password"
+                        minlength="8"
+                        required
+                    >
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        data-target="password"
+                        aria-label="顯示密碼"
+                        title="顯示密碼"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
 
                 <div id="confirm-password-group" class="hidden">
                     <label for="confirm-password">確認密碼</label>
-                    <input
-                        type="password"
-                        id="confirm-password"
-                        name="confirm-password"
-                        placeholder="再次輸入密碼"
-                        autocomplete="new-password"
-                        minlength="8"
-                    >
+                    <div class="password-field">
+                        <input
+                            type="password"
+                            id="confirm-password"
+                            name="confirm-password"
+                            placeholder="再次輸入密碼"
+                            autocomplete="new-password"
+                            minlength="8"
+                        >
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            data-target="confirm-password"
+                            aria-label="顯示密碼"
+                            title="顯示密碼"
+                        >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 <p id="form-message" class="form-message" aria-live="polite"></p>
