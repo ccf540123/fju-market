@@ -44,6 +44,9 @@ body {
 }
 
 .header-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: #444;
   font-size: 14px;
   text-decoration: none;
@@ -51,6 +54,21 @@ body {
 
 .header-nav a:hover {
   color: #111;
+}
+
+.nav-unread-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #e53935;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .header-search {
@@ -770,11 +788,21 @@ body.is-compact-category .sidebar.is-expanded .category-cascade {
   }
 
   .drawer-nav a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     padding: 16px 18px;
     border-bottom: 1px solid #f0f0f0;
     color: #222;
     font-size: 16px;
     text-decoration: none;
+  }
+
+  .drawer-nav .nav-unread-badge {
+    min-width: 20px;
+    height: 20px;
+    font-size: 12px;
   }
 
   .page-layout {

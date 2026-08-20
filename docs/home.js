@@ -790,6 +790,11 @@ async function loadCurrentUser() {
   currentUserNameEl.textContent = displayName;
   loginLink.classList.add("hidden");
   userArea.classList.remove("hidden");
+
+  // 登入後更新「我的訊息」未讀數字
+  if (typeof refreshMessagesNavBadges === "function") {
+    refreshMessagesNavBadges();
+  }
 }
 
 favoritesLinks.forEach(function (link) {

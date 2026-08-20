@@ -83,6 +83,11 @@ function subscribeMessages() {
       },
       function (payload) {
         appendMessage(payload.new);
+
+        // 人在對話裡時，對方新訊息也立刻標成已讀
+        if (payload.new.sender_id !== currentUser.id) {
+          markConversationAsRead(conversationId);
+        }
       }
     )
     .subscribe();
@@ -156,6 +161,7 @@ async function initChat() {
   chatBox.classList.remove("hidden");
 
   await loadMessages();
+  await markConversationAsRead(conversationId);
   subscribeMessages();
 }
 

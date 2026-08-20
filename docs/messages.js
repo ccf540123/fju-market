@@ -30,10 +30,17 @@ function getOtherUserId(conversation, currentUserId) {
   return null;
 }
 
-function createConversationCard(conversation, currentUserId, profileById, lastMessageById) {
+function createConversationCard(
+  conversation,
+  currentUserId,
+  profileById,
+  lastMessageById,
+  unreadCountById
+) {
   const otherUserId = getOtherUserId(conversation, currentUserId);
   const profile = (otherUserId && profileById[otherUserId]) || null;
   const lastMessage = lastMessageById[conversation.id] || null;
+  const unreadCount = unreadCountById[conversation.id] || 0;
 
   const displayName =
     (profile && profile.display_name) || "未知使用者";
@@ -49,6 +56,9 @@ function createConversationCard(conversation, currentUserId, profileById, lastMe
 
   const link = document.createElement("a");
   link.className = "conversation-item";
+  if (unreadCount > 0) {
+    link.classList.add("has-unread");
+  }
   link.href = "/chat/?id=" + conversation.id;
 
   const avatar = document.createElement("img");
@@ -87,6 +97,13 @@ function createConversationCard(conversation, currentUserId, profileById, lastMe
 
   link.appendChild(avatar);
   link.appendChild(body);
+
+  if (unreadCount > 0) {
+    const badge = document.createElement("span");
+    badge.className = "conversation-unread-badge";
+    badge.textContent = unreadCount > 99 ? "99+" : String(unreadCount);
+    link.appendChild(badge);
+  }
 
   return link;
 }
@@ -156,13 +173,14 @@ async function loadConversations() {
     }
   }
 
-  // 4) 抓這些對話的訊息，用最新的一則當預覽
+  // 4) 抓這些對話的訊息：最新一則當預覽，並計算未讀數
   const lastMessageById = {};
+  const unreadCountById = {};
 
   if (conversationIds.length > 0) {
     const messagesResult = await supabaseClient
       .from("messages")
-      .select("conversation_id, content, created_at")
+      .select("conversation_id, content, created_at, sender_id, is_read")
       .in("conversation_id", conversationIds)
       .order("created_at", { ascending: false });
 
@@ -172,6 +190,12 @@ async function loadConversations() {
       (messagesResult.data || []).forEach(function (message) {
         if (!lastMessageById[message.conversation_id]) {
           lastMessageById[message.conversation_id] = message;
+        }
+
+        // 別人寄給我、且尚未讀
+        if (message.sender_id !== user.id && message.is_read === false) {
+          unreadCountById[message.conversation_id] =
+            (unreadCountById[message.conversation_id] || 0) + 1;
         }
       });
     }
@@ -193,7 +217,8 @@ async function loadConversations() {
       row,
       user.id,
       profileById,
-      lastMessageById
+      lastMessageById,
+      unreadCountById
     );
     conversationList.appendChild(card);
   });
