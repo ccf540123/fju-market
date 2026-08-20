@@ -248,6 +248,19 @@ function collapseCategoryPanel() {
   }
 }
 
+function isCompactCategoryScreen() {
+  return window.innerWidth <= 960;
+}
+
+function updateCompactCategoryMode() {
+  if (isCompactCategoryScreen()) {
+    document.body.classList.add("is-compact-category");
+  } else {
+    document.body.classList.remove("is-compact-category");
+    collapseCategoryPanel();
+  }
+}
+
 function renderCategoryMenu() {
   // 還沒建過選單 → 先建立；之後只更新狀態
   if (!categoryList.dataset.built) {
@@ -820,6 +833,19 @@ if (categoryToggle) {
     categoryToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
   });
 }
+
+document.addEventListener("click", function (event) {
+  if (!categorySidebar || !categorySidebar.classList.contains("is-expanded")) {
+    return;
+  }
+
+  if (!categorySidebar.contains(event.target)) {
+    collapseCategoryPanel();
+  }
+});
+
+updateCompactCategoryMode();
+window.addEventListener("resize", updateCompactCategoryMode);
 
 logoutBtn.addEventListener("click", async function () {
   await supabaseClient.auth.signOut();
