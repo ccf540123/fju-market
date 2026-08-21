@@ -121,7 +121,6 @@ async function loadProfile() {
   if (!profile) {
     const insertResult = await supabaseClient.from("profiles").insert({
       id: currentUser.id,
-      display_name: currentUser.email.split("@")[0],
     }).select().maybeSingle();
 
     if (insertResult.error) {
