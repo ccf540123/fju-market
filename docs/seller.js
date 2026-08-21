@@ -2,8 +2,8 @@ const statusEl = document.getElementById("seller-status");
 const cardEl = document.getElementById("seller-card");
 const headingEl = document.getElementById("seller-heading");
 const avatarEl = document.getElementById("seller-avatar");
-const nameEl = document.getElementById("seller-name");
 const departmentEl = document.getElementById("seller-department");
+const bioEl = document.getElementById("seller-bio");
 const productsSection = document.getElementById("seller-products");
 const productList = document.getElementById("product-list");
 const productsEmpty = document.getElementById("products-empty");
@@ -100,7 +100,7 @@ async function loadSeller() {
   // 只讀公開欄位：姓名、頭像、科系
   const result = await supabaseClient
     .from("profiles")
-    .select("display_name, avatar_url, department")
+    .select("display_name, avatar_url, department, bio")
     .eq("id", id)
     .maybeSingle();
 
@@ -115,11 +115,19 @@ async function loadSeller() {
 
   document.title = name + "｜WAYFLOO";
   headingEl.textContent = name;
-  nameEl.textContent = name;
   departmentEl.textContent = profile.department || "未填寫";
   avatarEl.src =
     profile.avatar_url || "https://placehold.co/160x160/f0f0f0/666666?text=頭像";
   avatarEl.alt = name;
+
+  const bioText = profile.bio ? String(profile.bio).trim() : "";
+  if (bioText) {
+    bioEl.textContent = bioText;
+    bioEl.classList.remove("hidden");
+  } else {
+    bioEl.textContent = "";
+    bioEl.classList.add("hidden");
+  }
 
   statusEl.classList.add("hidden");
   cardEl.classList.remove("hidden");

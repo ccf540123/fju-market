@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="../apple-touch-icon.png">
     <link rel="stylesheet" href="/landing.css">
     <link rel="stylesheet" href="/login.css">
-    <link rel="stylesheet" href="/profile.css?v=3">
+    <link rel="stylesheet" href="/profile.css?v=5">
     <title>我的頁面｜WAYFLOO</title>
 </head>
 <body>
@@ -21,9 +21,6 @@
     <main class="auth-page profile-layout">
         <a href="/home/" class="back-link">← 返回商品列表</a>
 
-        <h1 class="auth-title">我的頁面</h1>
-        <p class="subtitle">更新姓名、科系與頭像，下方是你發布的商品</p>
-
         <div class="auth-card">
             <img id="avatar-preview" class="avatar-preview" alt="頭像預覽">
 
@@ -33,6 +30,9 @@
 
                 <label for="department">科系</label>
                 <input type="text" id="department" name="department" placeholder="例如：資訊工程學系">
+
+                <label for="bio">自我簡介</label>
+                <textarea id="bio" name="bio" rows="4" placeholder="想讓別人知道的話，可以寫在這裡"></textarea>
 
                 <label for="avatar-file">頭像</label>
                 <input type="file" id="avatar-file" name="avatar" accept="image/*">
@@ -54,6 +54,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/supabase-config.js"></script>
-    <script src="/profile.js?v=3"></script>
+    <script src="/profile.js?v=4"></script>
 </body>
 </html>

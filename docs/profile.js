@@ -1,6 +1,7 @@
 const form = document.getElementById("profile-form");
 const nameInput = document.getElementById("display-name");
 const departmentInput = document.getElementById("department");
+const bioInput = document.getElementById("bio");
 const avatarInput = document.getElementById("avatar-file");
 const avatarPreview = document.getElementById("avatar-preview");
 const messageEl = document.getElementById("profile-message");
@@ -134,6 +135,7 @@ async function loadProfile() {
 
   nameInput.value = profile.display_name || "";
   departmentInput.value = profile.department || "";
+  bioInput.value = profile.bio || "";
   currentAvatarUrl = profile.avatar_url || "";
   showAvatar(currentAvatarUrl);
   await loadMyProducts();
@@ -148,6 +150,7 @@ form.addEventListener("submit", async function (event) {
 
   const displayName = nameInput.value.trim();
   const department = departmentInput.value.trim();
+  const bio = bioInput.value.trim();
   const avatarFile = avatarInput.files[0];
 
   if (!displayName) {
@@ -187,6 +190,7 @@ form.addEventListener("submit", async function (event) {
     .update({
       display_name: displayName,
       department: department,
+      bio: bio || null,
       avatar_url: avatarUrl,
       updated_at: new Date().toISOString(),
     })

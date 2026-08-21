@@ -32,9 +32,30 @@
   font-size: 16px;
 }
 
-.profile-layout .auth-form input {
+.profile-layout .auth-form textarea {
+  width: 100%;
+  box-sizing: border-box;
   padding: 14px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
   font-size: 16px;
+  line-height: 1.5;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.seller-bio {
+  margin: 16px 0 0;
+  color: #444;
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: center;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.seller-bio.hidden {
+  display: none;
 }
 
 .seller-field {
