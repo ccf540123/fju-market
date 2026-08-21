@@ -1,0 +1,7 @@
+{
+  "name": "wayfloo",
+  "private": true,
+  "scripts": {
+    "dev": "npx --yes serve docs"
+  }
+}

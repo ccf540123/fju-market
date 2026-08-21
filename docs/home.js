@@ -28,13 +28,11 @@ const parentCategorySelect = document.getElementById("product-parent-category");
 const subcategorySelect = document.getElementById("product-subcategory");
 const productImageInput = document.getElementById("product-image");
 const productImageName = document.getElementById("product-image-name");
-const favoritesLinks = document.querySelectorAll('[data-nav="favorites"]');
 const messagesLinks = document.querySelectorAll('[data-nav="messages"]');
 const myProductsLinks = document.querySelectorAll('[data-nav="my-products"]');
 const profileLinks = document.querySelectorAll('[data-nav="profile"]');
 
 let currentUser = null;
-let favoriteIds = [];
 let categories = [];
 let parentCategories = [];
 let subcategoriesByParent = new Map();
@@ -369,64 +367,11 @@ function createProductCard(product) {
   price.className = "product-price";
   price.textContent = formatPrice(product.price || 0);
 
-  const favoriteBtn = document.createElement("button");
-  favoriteBtn.type = "button";
-  favoriteBtn.className = "favorite-btn";
-  const isFavorited = favoriteIds.indexOf(product.id) !== -1;
-  favoriteBtn.textContent = isFavorited ? "已收藏" : "收藏";
-  if (isFavorited) {
-    favoriteBtn.classList.add("active");
-  }
-
   info.appendChild(title);
   info.appendChild(price);
-  info.appendChild(favoriteBtn);
 
   card.appendChild(media);
   card.appendChild(info);
-
-  favoriteBtn.addEventListener("click", async function (event) {
-    event.stopPropagation();
-
-    if (!requireLogin()) {
-      return;
-    }
-
-    const alreadyFavorited = favoriteIds.indexOf(product.id) !== -1;
-
-    if (alreadyFavorited) {
-      const result = await supabaseClient
-        .from("favorites")
-        .delete()
-        .eq("user_id", currentUser.id)
-        .eq("product_id", product.id);
-
-      if (result.error) {
-        console.error(result.error);
-        alert("取消收藏失敗，請稍後再試");
-        return;
-      }
-
-      favoriteIds = favoriteIds.filter(function (id) {
-        return id !== product.id;
-      });
-    } else {
-      const result = await supabaseClient.from("favorites").insert({
-        user_id: currentUser.id,
-        product_id: product.id,
-      });
-
-      if (result.error) {
-        console.error(result.error);
-        alert("收藏失敗，請稍後再試");
-        return;
-      }
-
-      favoriteIds.push(product.id);
-    }
-
-    renderProducts();
-  });
 
   card.addEventListener("click", function () {
     window.location.href = "/product/?id=" + product.id;
@@ -518,28 +463,6 @@ async function loadCategories() {
   renderProducts();
 }
 
-async function loadFavoriteIds() {
-  favoriteIds = [];
-
-  if (!currentUser) {
-    return;
-  }
-
-  const result = await supabaseClient
-    .from("favorites")
-    .select("product_id")
-    .eq("user_id", currentUser.id);
-
-  if (result.error) {
-    console.error(result.error);
-    return;
-  }
-
-  favoriteIds = result.data.map(function (row) {
-    return row.product_id;
-  });
-}
-
 // 從 Supabase 抓商品資料
 async function loadProducts() {
   emptyMessage.classList.remove("hidden");
@@ -556,7 +479,6 @@ async function loadProducts() {
   }
 
   products = result.data;
-  await loadFavoriteIds();
   emptyMessage.textContent = "找不到符合的商品";
   renderProducts();
 }
@@ -777,13 +699,6 @@ async function loadCurrentUser() {
     refreshMessagesNavBadges();
   }
 }
-
-favoritesLinks.forEach(function (link) {
-  link.addEventListener("click", function (event) {
-    closeDrawer();
-    requireLoginOrStay(event);
-  });
-});
 
 messagesLinks.forEach(function (link) {
   link.addEventListener("click", function (event) {

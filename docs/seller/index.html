@@ -8,8 +8,8 @@
     <link rel="apple-touch-icon" href="../apple-touch-icon.png">
     <link rel="stylesheet" href="/landing.css">
     <link rel="stylesheet" href="/login.css">
-    <link rel="stylesheet" href="/profile.css">
-    <title>賣家檔案｜WAYFLOO</title>
+    <link rel="stylesheet" href="/profile.css?v=2">
+    <title>個人頁面｜WAYFLOO</title>
 </head>
 <body>
     <header class="site-header">
@@ -22,15 +22,21 @@
         <a id="back-link" href="/home/" class="back-link">← 返回商品</a>
         <p id="seller-status" class="subtitle">載入中...</p>
         <div id="seller-card" class="auth-card hidden">
-            <h1 class="auth-title"></h1>
+            <h1 id="seller-heading" class="auth-title"></h1>
             <img id="seller-avatar" class="avatar-preview" alt="賣家頭像">
             <p class="seller-field"><span>姓名</span> <strong id="seller-name"></strong></p>
             <p class="seller-field"><span>科系</span> <strong id="seller-department"></strong></p>
         </div>
+
+        <section id="seller-products" class="profile-products hidden">
+            <h2 class="profile-products-title">發布的商品</h2>
+            <p id="products-empty" class="profile-products-empty">載入中...</p>
+            <div id="product-list" class="product-grid"></div>
+        </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/supabase-config.js"></script>
-    <script src="/seller.js"></script>
+    <script src="/seller.js?v=2"></script>
 </body>
 </html>

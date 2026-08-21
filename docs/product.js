@@ -44,7 +44,7 @@ async function showProduct(product, sellerProfile) {
     const sellerLink = document.createElement("a");
     sellerLink.className = "seller-link";
     sellerLink.href = "/seller/?id=" + product.seller_id + "&productId=" + product.id;
-    sellerLink.textContent = sellerName + "（查看檔案）";
+    sellerLink.textContent = sellerName + "（查看個人頁面）";
     sellerLine.appendChild(sellerLink);
   } else {
     sellerLine.textContent = "賣家：" + sellerName;

@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="../apple-touch-icon.png">
     <link rel="stylesheet" href="/landing.css">
     <link rel="stylesheet" href="/login.css">
-    <link rel="stylesheet" href="/profile.css">
+    <link rel="stylesheet" href="/profile.css?v=2">
     <title>編輯個人檔案｜WAYFLOO</title>
 </head>
 <body>
@@ -43,10 +43,16 @@
                 <button type="submit" class="box auth-submit">儲存</button>
             </form>
         </div>
+
+        <section class="profile-products">
+            <h2 class="profile-products-title">我的商品</h2>
+            <p id="products-empty" class="profile-products-empty">載入中...</p>
+            <div id="product-list" class="product-grid"></div>
+        </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/supabase-config.js"></script>
-    <script src="/profile.js"></script>
+    <script src="/profile.js?v=2"></script>
 </body>
 </html>
