@@ -34,9 +34,7 @@ async function showProduct(product, sellerProfile) {
   price.textContent = formatPrice(product.price || 0);
 
   const sellerName =
-    (sellerProfile && sellerProfile.display_name) ||
-    product.seller ||
-    "未知賣家";
+    (sellerProfile && sellerProfile.display_name) || "未知賣家";
 
   const sellerLine = document.createElement("p");
   sellerLine.className = "product-meta";

@@ -361,10 +361,6 @@ function createProductCard(product) {
   const info = document.createElement("div");
   info.className = "product-info";
 
-  const seller = document.createElement("p");
-  seller.className = "product-seller";
-  seller.textContent = product.seller || "未知賣家";
-
   const title = document.createElement("h3");
   title.className = "product-title";
   title.textContent = product.title;
@@ -382,7 +378,6 @@ function createProductCard(product) {
     favoriteBtn.classList.add("active");
   }
 
-  info.appendChild(seller);
   info.appendChild(title);
   info.appendChild(price);
   info.appendChild(favoriteBtn);
@@ -454,11 +449,9 @@ function renderProducts() {
       currentSubcategory === "all" ||
       String(productContext.subcategoryId) === String(currentSubcategory);
 
-    const sellerText = (product.seller || "").toLowerCase();
     const matchSearch =
       keyword === "" ||
-      product.title.toLowerCase().includes(keyword) ||
-      sellerText.includes(keyword);
+      product.title.toLowerCase().includes(keyword);
 
     return parentMatch && subcategoryMatch && matchSearch;
   });
@@ -698,17 +691,6 @@ publishForm.addEventListener("submit", async function (event) {
   }
 
   isPublishing = true;
-
-  const profileResult = await supabaseClient
-    .from("profiles")
-    .select("display_name")
-    .eq("id", currentUser.id)
-    .maybeSingle();
-
-  const sellerName =
-    (profileResult.data && profileResult.data.display_name) ||
-    currentUser.email.split("@")[0];
-
   publishMessage.textContent = "發布中...";
 
   const filePath =
@@ -732,11 +714,10 @@ publishForm.addEventListener("submit", async function (event) {
 
   const imageUrl = publicUrlResult.data.publicUrl;
 
-  // 有選子分類就用子分類；沒選就用主分類（現有讀取邏輯已支援）
+  // 賣家名稱不寫進 products，詳情頁用 seller_id 去 profiles 取 display_name
   const result = await supabaseClient.from("products").insert({
     title: title,
     price: price,
-    seller: sellerName,
     seller_id: currentUser.id,
     category_id: Number(selectedCategory.id),
     category: selectedCategory.name,

@@ -20,10 +20,6 @@ function createMyProductCard(product) {
   const info = document.createElement("div");
   info.className = "product-info";
 
-  const seller = document.createElement("p");
-  seller.className = "product-seller";
-  seller.textContent = product.seller || "未知賣家";
-
   const title = document.createElement("h3");
   title.className = "product-title";
   title.textContent = product.title;
@@ -38,7 +34,6 @@ function createMyProductCard(product) {
   deleteBtn.textContent = "刪除";
   deleteBtn.style.borderRadius ="12px";
 
-  info.appendChild(seller);
   info.appendChild(title);
   info.appendChild(price);
   info.appendChild(deleteBtn);

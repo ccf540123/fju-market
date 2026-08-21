@@ -22,10 +22,6 @@ function createFavoriteCard(product) {
   const info = document.createElement("div");
   info.className = "product-info";
 
-  const seller = document.createElement("p");
-  seller.className = "product-seller";
-  seller.textContent = product.seller || "未知賣家";
-
   const title = document.createElement("h3");
   title.className = "product-title";
   title.textContent = product.title;
@@ -39,7 +35,6 @@ function createFavoriteCard(product) {
   removeBtn.className = "favorite-btn active";
   removeBtn.textContent = "取消收藏";
 
-  info.appendChild(seller);
   info.appendChild(title);
   info.appendChild(price);
   info.appendChild(removeBtn);
