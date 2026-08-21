@@ -82,13 +82,21 @@
   font-size: 14px;
 }
 
-.auth-form input {
+.auth-form input,
+.auth-form select {
   width: 100%;
   padding: 12px 14px;
   border: 1px solid #ddd;
   border-radius: 4px;
   background: #fff;
   font-size: 15px;
+}
+
+.auth-hint {
+  margin: 4px 0 0;
+  color: #777;
+  font-size: 13px;
+  line-height: 1.4;
 }
 
 .password-field {
@@ -134,7 +142,8 @@
   background: #f7f7f7;
 }
 
-.auth-form input:focus {
+.auth-form input:focus,
+.auth-form select:focus {
   outline: 1px solid #999;
   outline-offset: 0;
 }

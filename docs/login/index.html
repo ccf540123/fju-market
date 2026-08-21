@@ -7,7 +7,7 @@
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="../apple-touch-icon.png">
     <link rel="stylesheet" href="/landing.css">
-    <link rel="stylesheet" href="/login.css">
+    <link rel="stylesheet" href="/login.css?v=2">
     <title>登入｜WAYFLOO</title>
 </head>
 <body>
@@ -21,7 +21,7 @@
         <a href="/" class="back-link">← 返回首頁</a>
 
         <h1 class="auth-title">WAYFLOO</h1>
-        <p class="subtitle">校園二手交易平台，目前提供輔大學生使用</p>
+        <p class="subtitle">校園二手交易平台，請先選擇學校再輸入學號</p>
 
         <div class="auth-card">
             <div class="auth-tabs">
@@ -30,15 +30,27 @@
             </div>
 
             <form id="auth-form" class="auth-form" novalidate>
-                <label for="email">學校信箱</label>
+                <label for="school-select">學校</label>
+                <select id="school-select" name="school" required>
+                    <option value="">載入學校中...</option>
+                </select>
+
+                <label for="student-id">學號</label>
                 <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="學號@cloud.fju.edu.tw"
-                    autocomplete="email"
+                    type="text"
+                    id="student-id"
+                    name="student-id"
+                    placeholder="請輸入學號"
+                    autocomplete="username"
                     required
                 >
+
+                <div id="email-domain-group" class="hidden">
+                    <label for="email-domain">學校信箱類型</label>
+                    <select id="email-domain" name="email-domain"></select>
+                </div>
+
+                <p id="composed-email-hint" class="auth-hint"></p>
 
                 <label for="password">密碼</label>
                 <div class="password-field">
@@ -101,6 +113,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/supabase-config.js"></script>
-    <script src="/login.js"></script>
+    <script src="/schools.js?v=1"></script>
+    <script src="/login.js?v=2"></script>
 </body>
 </html>

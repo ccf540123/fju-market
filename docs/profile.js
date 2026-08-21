@@ -119,8 +119,11 @@ async function loadProfile() {
   let profile = result.data;
 
   if (!profile) {
+    const schools = await loadSchools();
+    const school = findSchoolByEmail(schools, currentUser.email);
     const insertResult = await supabaseClient.from("profiles").insert({
       id: currentUser.id,
+      school_id: school ? school.id : null,
     }).select().maybeSingle();
 
     if (insertResult.error) {

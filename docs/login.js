@@ -1,6 +1,9 @@
-const SCHOOL_EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@cloud\.fju\.edu\.tw$/;
-
 const form = document.getElementById("auth-form");
+const schoolSelect = document.getElementById("school-select");
+const studentIdInput = document.getElementById("student-id");
+const emailDomainGroup = document.getElementById("email-domain-group");
+const emailDomainSelect = document.getElementById("email-domain");
+const composedEmailHint = document.getElementById("composed-email-hint");
 const tabs = document.querySelectorAll(".auth-tab");
 const confirmGroup = document.getElementById("confirm-password-group");
 const confirmInput = document.getElementById("confirm-password");
@@ -9,6 +12,7 @@ const submitBtn = document.querySelector(".auth-submit");
 const forgotBtn = document.getElementById("forgot-password-btn");
 
 let mode = "login";
+let schools = [];
 
 const EYE_OPEN =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
@@ -38,9 +42,92 @@ function setupPasswordToggles() {
 
 setupPasswordToggles();
 
-function setMessage(text, type = "") {
+function setMessage(text, type) {
   messageEl.textContent = text;
-  messageEl.className = type ? `form-message ${type}` : "form-message";
+  messageEl.className = type ? "form-message " + type : "form-message";
+}
+
+function getSelectedSchool() {
+  return findSchoolById(schools, schoolSelect.value);
+}
+
+function getSelectedDomain(school) {
+  const domains = getSchoolDomains(school);
+
+  if (domains.length === 0) {
+    return "";
+  }
+
+  if (domains.length === 1) {
+    return domains[0];
+  }
+
+  return emailDomainSelect.value || domains[0];
+}
+
+function updateDomainOptions() {
+  const school = getSelectedSchool();
+  const domains = getSchoolDomains(school);
+
+  emailDomainSelect.textContent = "";
+
+  if (domains.length <= 1) {
+    emailDomainGroup.classList.add("hidden");
+    updateComposedEmailHint();
+    return;
+  }
+
+  domains.forEach(function (domain) {
+    const option = document.createElement("option");
+    option.value = domain;
+    option.textContent = "@" + domain;
+    emailDomainSelect.appendChild(option);
+  });
+
+  emailDomainGroup.classList.remove("hidden");
+  updateComposedEmailHint();
+}
+
+function updateComposedEmailHint() {
+  const school = getSelectedSchool();
+  const studentId = studentIdInput.value.trim();
+  const domain = getSelectedDomain(school);
+
+  if (!school || !domain) {
+    composedEmailHint.textContent = "";
+    return;
+  }
+
+  if (!studentId) {
+    composedEmailHint.textContent = "將使用學號@" + domain;
+    return;
+  }
+
+  composedEmailHint.textContent =
+    "將使用 " + composeSchoolEmail(studentId, domain);
+}
+
+function getLoginEmail() {
+  const school = getSelectedSchool();
+  const studentId = studentIdInput.value.trim();
+  const domain = getSelectedDomain(school);
+
+  if (!school) {
+    setMessage("請選擇學校");
+    return "";
+  }
+
+  if (!isValidStudentId(studentId)) {
+    setMessage("請輸入學號，不要包含 @");
+    return "";
+  }
+
+  if (!domain) {
+    setMessage("找不到這間學校的信箱網域");
+    return "";
+  }
+
+  return composeSchoolEmail(studentId, domain);
 }
 
 function getAuthErrorMessage(error) {
@@ -63,8 +150,6 @@ function getAuthErrorMessage(error) {
   return text;
 }
 
-// Supabase 在開啟「確認信箱」時，已註冊 email 可能不會回傳 error，
-// 而是回傳 user.identities 為空陣列（避免洩漏帳號是否存在的細節給攻擊者）。
 function isExistingEmailSignUp(result) {
   if (result.error) {
     const message = getAuthErrorMessage(result.error);
@@ -90,7 +175,7 @@ function goToHome() {
 function switchMode(nextMode) {
   mode = nextMode;
 
-  tabs.forEach((tab) => {
+  tabs.forEach(function (tab) {
     tab.classList.toggle("active", tab.dataset.mode === mode);
   });
 
@@ -102,19 +187,24 @@ function switchMode(nextMode) {
   setMessage("");
 }
 
-tabs.forEach((tab) => {
-  tab.addEventListener("click", () => switchMode(tab.dataset.mode));
+tabs.forEach(function (tab) {
+  tab.addEventListener("click", function () {
+    switchMode(tab.dataset.mode);
+  });
 });
 
-form.addEventListener("submit", async (event) => {
+schoolSelect.addEventListener("change", updateDomainOptions);
+studentIdInput.addEventListener("input", updateComposedEmailHint);
+emailDomainSelect.addEventListener("change", updateComposedEmailHint);
+
+form.addEventListener("submit", async function (event) {
   event.preventDefault();
 
-  const email = form.email.value.trim();
+  const email = getLoginEmail();
   const password = form.password.value;
   const confirmPassword = confirmInput.value;
 
-  if (!SCHOOL_EMAIL_PATTERN.test(email)) {
-    setMessage("請使用輔大學校信箱（@cloud.fju.edu.tw）");
+  if (!email) {
     return;
   }
 
@@ -148,6 +238,10 @@ form.addEventListener("submit", async (event) => {
         return;
       }
 
+      if (result.data.user && result.data.session) {
+        await ensureProfileSchool(result.data.user, schools);
+      }
+
       if (!result.data.session) {
         setMessage("註冊成功，請到信箱確認後再登入", "success");
         return;
@@ -167,6 +261,10 @@ form.addEventListener("submit", async (event) => {
       return;
     }
 
+    if (result.data.user) {
+      await ensureProfileSchool(result.data.user, schools);
+    }
+
     goToHome();
   } catch (error) {
     console.error(error);
@@ -177,10 +275,9 @@ form.addEventListener("submit", async (event) => {
 });
 
 forgotBtn.addEventListener("click", async function () {
-  const email = form.email.value.trim();
+  const email = getLoginEmail();
 
-  if (!SCHOOL_EMAIL_PATTERN.test(email)) {
-    setMessage("請先輸入輔大學校信箱（@cloud.fju.edu.tw）");
+  if (!email) {
     return;
   }
 
@@ -201,3 +298,29 @@ forgotBtn.addEventListener("click", async function () {
   setMessage("重設信件已寄出，請到信箱點開連結", "success");
   forgotBtn.disabled = false;
 });
+
+async function initLoginPage() {
+  schools = await loadSchools();
+  schoolSelect.textContent = "";
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "請選擇學校";
+  schoolSelect.appendChild(placeholder);
+
+  if (schools.length === 0) {
+    setMessage("學校資料載入失敗，請稍後再試");
+    return;
+  }
+
+  schools.forEach(function (school) {
+    const option = document.createElement("option");
+    option.value = String(school.id);
+    option.textContent = school.name;
+    schoolSelect.appendChild(option);
+  });
+
+  updateDomainOptions();
+}
+
+initLoginPage();

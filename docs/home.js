@@ -28,6 +28,8 @@ const messagesEntry = document.getElementById("messages-entry");
 const profileEntry = document.getElementById("profile-entry");
 
 let currentUser = null;
+let schools = [];
+let currentSchoolId = null;
 let categories = [];
 let parentCategories = [];
 let subcategoriesByParent = new Map();
@@ -464,8 +466,19 @@ async function loadProducts() {
   emptyMessage.textContent = "載入商品中...";
 
   // from("products") = 讀 products 這張表
-  // select("*") = 抓全部欄位
-  const result = await supabaseClient.from("products").select("*");
+  // 先只顯示目前學校的商品（未登入時預設輔仁大學）
+  if (!currentSchoolId) {
+    console.error("school_id is missing");
+    emptyMessage.textContent = "載入失敗，請稍後再試";
+    products = [];
+    renderProducts();
+    return;
+  }
+
+  const result = await supabaseClient
+    .from("products")
+    .select("*")
+    .eq("school_id", currentSchoolId);
 
   if (result.error) {
     console.error(result.error);
@@ -607,6 +620,15 @@ publishForm.addEventListener("submit", async function (event) {
     return;
   }
 
+  if (!currentSchoolId) {
+    currentSchoolId = await ensureProfileSchool(currentUser, schools);
+  }
+
+  if (!currentSchoolId) {
+    publishMessage.textContent = "找不到你的學校資料，請重新登入後再試";
+    return;
+  }
+
   isPublishing = true;
   publishMessage.textContent = "發布中...";
 
@@ -636,6 +658,7 @@ publishForm.addEventListener("submit", async function (event) {
     title: title,
     price: price,
     seller_id: currentUser.id,
+    school_id: currentSchoolId,
     category_id: Number(selectedCategory.id),
     category: selectedCategory.name,
     description: description || null,
@@ -662,10 +685,14 @@ loadCurrentUser().then(async function () {
 });
 
 async function loadCurrentUser() {
+  schools = await loadSchools();
+
   const result = await supabaseClient.auth.getUser();
   currentUser = result.data.user || null;
 
   if (!currentUser) {
+    const defaultSchool = findSchoolBySlug(schools, DEFAULT_SCHOOL_SLUG);
+    currentSchoolId = defaultSchool ? defaultSchool.id : null;
     loginLink.classList.remove("hidden");
     userArea.classList.add("hidden");
     if (messagesEntry) {
@@ -674,14 +701,19 @@ async function loadCurrentUser() {
     return;
   }
 
+  currentSchoolId = await ensureProfileSchool(currentUser, schools);
+
   const profileResult = await supabaseClient
     .from("profiles")
-    .select("avatar_url, display_name")
+    .select("avatar_url, display_name, school_id")
     .eq("id", currentUser.id)
     .maybeSingle();
 
   const profile = profileResult.data || {};
-  const displayName = profile.display_name || currentUser.email.split("@")[0];
+  if (profile.school_id) {
+    currentSchoolId = profile.school_id;
+  }
+  const displayName = profile.display_name || "使用者";
   const avatarUrl =
     profile.avatar_url ||
     "https://placehold.co/36x36/f0f0f0/666666?text=頭像";
