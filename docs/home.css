@@ -73,7 +73,6 @@ body {
 
 .header-search {
   width: min(280px, 40%);
-  margin-left: auto;
 }
 
 .header-search input {
@@ -95,6 +94,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-left: auto;
 }
 
 .header-actions a#login-link {
@@ -718,6 +718,7 @@ body.is-compact-category .sidebar.is-expanded .category-cascade {
 
 @media (max-width: 720px) {
   .header-inner {
+    justify-content: space-between;
     gap: 12px;
     padding: 12px 16px;
   }
