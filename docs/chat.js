@@ -1,9 +1,15 @@
-const chatTitle = document.getElementById("chat-title");
+const chatPeerName = document.getElementById("chat-peer-name");
+const chatAvatar = document.getElementById("chat-avatar");
+const chatProduct = document.getElementById("chat-product");
 const chatStatus = document.getElementById("chat-status");
 const chatBox = document.getElementById("chat-box");
 const messageList = document.getElementById("message-list");
 const chatForm = document.getElementById("chat-form");
 const messageInput = document.getElementById("message-input");
+const chatShell = document.getElementById("chat-shell");
+
+const DEFAULT_AVATAR =
+  "https://placehold.co/48x48/f0f0f0/666666?text=頭像";
 
 let currentUser = null;
 let conversationId = null;
@@ -17,6 +23,41 @@ function formatTime(value) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function formatPrice(price) {
+  return "NT$" + Number(price).toLocaleString("zh-TW");
+}
+
+function getOtherUserId(conversation, currentUserId) {
+  if (currentUserId === conversation.buyer_id) {
+    return conversation.seller_id;
+  }
+
+  if (currentUserId === conversation.seller_id) {
+    return conversation.buyer_id;
+  }
+
+  return null;
+}
+
+function scrollToLatest() {
+  messageList.scrollTop = messageList.scrollHeight;
+}
+
+function fitChatHeight() {
+  if (!chatShell || !window.visualViewport) {
+    return;
+  }
+
+  // 手機鍵盤出現時，用實際可見高度，避免輸入框被擋住
+  chatShell.style.height = window.visualViewport.height + "px";
+}
+
+function resizeInput() {
+  messageInput.style.height = "auto";
+  const nextHeight = Math.min(messageInput.scrollHeight, 120);
+  messageInput.style.height = nextHeight + "px";
 }
 
 function appendMessage(message) {
@@ -46,7 +87,7 @@ function appendMessage(message) {
   item.appendChild(meta);
   item.appendChild(content);
   messageList.appendChild(item);
-  messageList.scrollTop = messageList.scrollHeight;
+  scrollToLatest();
 }
 
 async function loadMessages() {
@@ -68,6 +109,8 @@ async function loadMessages() {
   result.data.forEach(function (message) {
     appendMessage(message);
   });
+
+  scrollToLatest();
 }
 
 function subscribeMessages() {
@@ -84,7 +127,6 @@ function subscribeMessages() {
       function (payload) {
         appendMessage(payload.new);
 
-        // 人在對話裡時，對方新訊息也立刻標成已讀
         if (payload.new.sender_id !== currentUser.id) {
           markConversationAsRead(conversationId);
         }
@@ -119,7 +161,11 @@ chatForm.addEventListener("submit", async function (event) {
 
   appendMessage(result.data);
   messageInput.value = "";
+  resizeInput();
+  messageInput.focus();
 });
+
+messageInput.addEventListener("input", resizeInput);
 
 async function initChat() {
   const params = new URLSearchParams(window.location.search);
@@ -141,7 +187,7 @@ async function initChat() {
 
   const conversationResult = await supabaseClient
     .from("conversations")
-    .select("id, product_id, buyer_id, seller_id, products(title)")
+    .select("id, product_id, buyer_id, seller_id, products(title, price)")
     .eq("id", conversationId)
     .maybeSingle();
 
@@ -152,17 +198,50 @@ async function initChat() {
   }
 
   const conversation = conversationResult.data;
-  const productTitle =
-    (conversation.products && conversation.products.title) || "商品聊天";
+  const otherUserId = getOtherUserId(conversation, currentUser.id);
 
-  chatTitle.textContent = productTitle;
-  document.title = productTitle + "｜聊天";
+  let peerName = "未知使用者";
+  let peerAvatar = DEFAULT_AVATAR;
+
+  if (otherUserId) {
+    const profileResult = await supabaseClient
+      .from("profiles")
+      .select("display_name, avatar_url")
+      .eq("id", otherUserId)
+      .maybeSingle();
+
+    if (profileResult.data) {
+      peerName = profileResult.data.display_name || peerName;
+      peerAvatar = profileResult.data.avatar_url || peerAvatar;
+    }
+  }
+
+  const product = conversation.products || null;
+  const productTitle = (product && product.title) || "商品聊天";
+  let productLine = productTitle;
+  if (product && product.price !== null && product.price !== undefined) {
+    productLine = productTitle + " · " + formatPrice(product.price);
+  }
+
+  chatPeerName.textContent = peerName;
+  chatAvatar.src = peerAvatar;
+  chatAvatar.alt = peerName;
+  chatProduct.textContent = productLine;
+  document.title = peerName + "｜聊天";
+
   chatStatus.classList.add("hidden");
   chatBox.classList.remove("hidden");
 
   await loadMessages();
   await markConversationAsRead(conversationId);
   subscribeMessages();
+  resizeInput();
+}
+
+if (window.visualViewport) {
+  fitChatHeight();
+  window.visualViewport.addEventListener("resize", fitChatHeight);
+  window.visualViewport.addEventListener("scroll", fitChatHeight);
 }
 
 initChat();
