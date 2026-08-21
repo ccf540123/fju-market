@@ -6,21 +6,14 @@
     <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32">
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="../apple-touch-icon.png">
-    <link rel="stylesheet" href="/home.css?v=9">
+    <link rel="stylesheet" href="/home.css?v=10">
     <title>商品瀏覽｜WAYFLOO</title>
 </head>
 <body>
     <!-- 上方導覽列：Logo + 搜尋 -->
     <header class="site-header">
         <div class="header-inner">
-            <button type="button" id="menu-btn" class="menu-btn" aria-label="開啟選單">☰</button>
-            <span class="logo">WAYFLOO</span>
-
-            <nav class="header-nav">
-                <a href="/messages/" data-nav="messages">我的訊息</a>
-                <a href="/my-products/" data-nav="my-products">我的商品</a>
-                <a href="/profile/" data-nav="profile">編輯個人檔案</a>
-            </nav>
+            <a href="/home/" class="logo">WAYFLOO</a>
 
             <div class="header-search">
                 <input
@@ -30,29 +23,35 @@
                 >
             </div>
 
-            <div class="header-auth">
+            <div class="header-actions">
+                <a
+                    href="/messages/"
+                    id="messages-entry"
+                    class="messages-entry hidden"
+                    data-nav="messages"
+                    aria-label="訊息"
+                >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                            d="M4 5h16v11H7l-3 3V5z"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </a>
                 <a href="/login/" id="login-link">登入</a>
                 <span id="user-area" class="user-area hidden">
-                    <img id="current-user" class="current-user-avatar" alt="使用者頭像" src="https://placehold.co/36x36/f0f0f0/666666?text=頭像">
+                    <a href="/profile/" id="profile-entry" class="profile-entry" aria-label="我的個人頁面">
+                        <img id="current-user" class="current-user-avatar" alt="使用者頭像" src="https://placehold.co/36x36/f0f0f0/666666?text=頭像">
+                    </a>
                     <span id="current-user-name" class="current-user-name"></span>
                     <button type="button" id="logout-btn">登出</button>
                 </span>
             </div>
         </div>
     </header>
-
-    <div id="drawer-overlay" class="drawer-overlay"></div>
-    <aside id="drawer" class="drawer">
-        <div class="drawer-header">
-            <span>選單</span>
-            <button type="button" id="drawer-close" class="drawer-close" aria-label="關閉選單">✕</button>
-        </div>
-        <nav class="drawer-nav">
-            <a href="/messages/" data-nav="messages">我的訊息</a>
-            <a href="/my-products/" data-nav="my-products">我的商品</a>
-            <a href="/profile/" data-nav="profile">編輯個人檔案</a>
-        </nav>
-    </aside>
 
     <div class="page-layout">
         <!-- 左側分類篩選：點主分類後，子分類嵌在該項目下方 -->
@@ -160,7 +159,7 @@
     <!-- Supabase 官方函式庫（CDN） -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/supabase-config.js"></script>
-    <script src="/unread.js?v=1"></script>
-    <script src="/home.js?v=10"></script>
+    <script src="/unread.js?v=2"></script>
+    <script src="/home.js?v=11"></script>
 </body>
 </html>

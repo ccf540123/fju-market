@@ -8,21 +8,21 @@
     <link rel="apple-touch-icon" href="../apple-touch-icon.png">
     <link rel="stylesheet" href="/landing.css">
     <link rel="stylesheet" href="/login.css">
-    <link rel="stylesheet" href="/profile.css?v=2">
-    <title>編輯個人檔案｜WAYFLOO</title>
+    <link rel="stylesheet" href="/profile.css?v=3">
+    <title>我的頁面｜WAYFLOO</title>
 </head>
 <body>
     <header class="site-header">
         <div class="header-inner">
-            <span class="logo">WAYFLOO</span>
+            <a href="/home/" class="logo">WAYFLOO</a>
         </div>
     </header>
 
     <main class="auth-page profile-layout">
         <a href="/home/" class="back-link">← 返回商品列表</a>
 
-        <h1 class="auth-title">編輯個人檔案</h1>
-        <p class="subtitle">更新你的姓名、科系與頭像</p>
+        <h1 class="auth-title">我的頁面</h1>
+        <p class="subtitle">更新姓名、科系與頭像，下方是你發布的商品</p>
 
         <div class="auth-card">
             <img id="avatar-preview" class="avatar-preview" alt="頭像預覽">
@@ -42,6 +42,7 @@
 
                 <button type="submit" class="box auth-submit">儲存</button>
             </form>
+            <button type="button" id="logout-btn" class="profile-logout">登出</button>
         </div>
 
         <section class="profile-products">
@@ -53,6 +54,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/supabase-config.js"></script>
-    <script src="/profile.js?v=2"></script>
+    <script src="/profile.js?v=3"></script>
 </body>
 </html>

@@ -16,10 +16,6 @@ const userArea = document.getElementById("user-area");
 const currentUserEl = document.getElementById("current-user");
 const currentUserNameEl = document.getElementById("current-user-name");
 const logoutBtn = document.getElementById("logout-btn");
-const menuBtn = document.getElementById("menu-btn");
-const drawer = document.getElementById("drawer");
-const drawerOverlay = document.getElementById("drawer-overlay");
-const drawerClose = document.getElementById("drawer-close");
 const categoryList = document.getElementById("category-list");
 const categorySidebar = document.getElementById("category-sidebar");
 const categoryToggle = document.getElementById("category-toggle");
@@ -28,9 +24,8 @@ const parentCategorySelect = document.getElementById("product-parent-category");
 const subcategorySelect = document.getElementById("product-subcategory");
 const productImageInput = document.getElementById("product-image");
 const productImageName = document.getElementById("product-image-name");
-const messagesLinks = document.querySelectorAll('[data-nav="messages"]');
-const myProductsLinks = document.querySelectorAll('[data-nav="my-products"]');
-const profileLinks = document.querySelectorAll('[data-nav="profile"]');
+const messagesEntry = document.getElementById("messages-entry");
+const profileEntry = document.getElementById("profile-entry");
 
 let currentUser = null;
 let categories = [];
@@ -673,6 +668,9 @@ async function loadCurrentUser() {
   if (!currentUser) {
     loginLink.classList.remove("hidden");
     userArea.classList.add("hidden");
+    if (messagesEntry) {
+      messagesEntry.classList.add("hidden");
+    }
     return;
   }
 
@@ -693,55 +691,27 @@ async function loadCurrentUser() {
   currentUserNameEl.textContent = displayName;
   loginLink.classList.add("hidden");
   userArea.classList.remove("hidden");
+  if (messagesEntry) {
+    messagesEntry.classList.remove("hidden");
+  }
 
-  // 登入後更新「我的訊息」未讀數字
+  // 登入後更新訊息未讀數字
   if (typeof refreshMessagesNavBadges === "function") {
     refreshMessagesNavBadges();
   }
 }
 
-messagesLinks.forEach(function (link) {
-  link.addEventListener("click", function (event) {
-    closeDrawer();
+if (messagesEntry) {
+  messagesEntry.addEventListener("click", function (event) {
     requireLoginOrStay(event);
   });
-});
-
-myProductsLinks.forEach(function (link) {
-  link.addEventListener("click", function (event) {
-    closeDrawer();
-    requireLoginOrStay(event);
-  });
-});
-
-profileLinks.forEach(function (link) {
-  link.addEventListener("click", function (event) {
-    closeDrawer();
-    requireLoginOrStay(event);
-  });
-});
-
-function openDrawer() {
-  drawer.classList.add("open");
-  drawerOverlay.classList.add("open");
 }
 
-function closeDrawer() {
-  drawer.classList.remove("open");
-  drawerOverlay.classList.remove("open");
+if (profileEntry) {
+  profileEntry.addEventListener("click", function (event) {
+    requireLoginOrStay(event);
+  });
 }
-
-menuBtn.addEventListener("click", function () {
-  openDrawer();
-});
-
-drawerClose.addEventListener("click", function () {
-  closeDrawer();
-});
-
-drawerOverlay.addEventListener("click", function () {
-  closeDrawer();
-});
 
 if (categoryToggle) {
   categoryToggle.addEventListener("click", function () {

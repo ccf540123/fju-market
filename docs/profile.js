@@ -206,3 +206,11 @@ form.addEventListener("submit", async function (event) {
 });
 
 loadProfile();
+
+const logoutBtn = document.getElementById("logout-btn");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async function () {
+    await supabaseClient.auth.signOut();
+    window.location.href = "/login/";
+  });
+}
