@@ -1,4 +1,5 @@
 {
   "liveServer.settings.root": "/docs",
-  "livePreview.defaultPreviewPath": "/docs/index.html"
+  "livePreview.defaultPreviewPath": "/docs/index.html",
+  "liveServer.settings.port": 5501
 }
