@@ -10,10 +10,18 @@ function showError(text) {
   detailEl.classList.add("hidden");
 }
 
-async function showProduct(product, sellerProfile) {
+async function showProduct(product, sellerProfile, schools, currentUser) {
   statusEl.classList.add("hidden");
   detailEl.classList.remove("hidden");
   detailEl.textContent = "";
+
+  const isOwner = currentUser && product.seller_id === currentUser.id;
+  const isAnonymous = product.is_anonymous === true && !isOwner;
+  const sellerName =
+    (sellerProfile && sellerProfile.display_name) || "未知賣家";
+  const shownSellerName = isAnonymous ? "匿名賣家" : sellerName;
+  const school = findSchoolById(schools, product.school_id);
+  const postedAt = formatRelativeTime(product.created_at);
 
   const img = document.createElement("img");
   img.src = product.image || "https://placehold.co/400x400/f0f0f0/666666?text=商品";
@@ -33,41 +41,57 @@ async function showProduct(product, sellerProfile) {
   price.className = "product-price";
   price.textContent = formatPrice(product.price || 0);
 
-  const sellerName =
-    (sellerProfile && sellerProfile.display_name) || "未知賣家";
-
-  const sellerLine = document.createElement("p");
-  sellerLine.className = "product-meta";
-
-  if (product.seller_id) {
-    sellerLine.appendChild(document.createTextNode("賣家："));
-    const sellerLink = document.createElement("a");
-    sellerLink.className = "seller-link";
-    sellerLink.href = "/seller/?id=" + product.seller_id + "&productId=" + product.id;
-    sellerLink.textContent = sellerName + "（查看個人頁面）";
-    sellerLine.appendChild(sellerLink);
-  } else {
-    sellerLine.textContent = "賣家：" + sellerName;
-  }
-
   info.appendChild(title);
   info.appendChild(price);
-  info.appendChild(sellerLine);
 
-  // 新欄位 description；舊資料可能還在拼錯的 descirption
+  if (postedAt) {
+    const timeLine = document.createElement("p");
+    timeLine.className = "product-meta";
+    timeLine.textContent = postedAt + " 發布";
+    info.appendChild(timeLine);
+  }
+
+  if (school) {
+    const schoolLine = document.createElement("p");
+    schoolLine.className = "product-meta";
+    schoolLine.textContent = school.name;
+    info.appendChild(schoolLine);
+  }
+
   const descriptionText =
     (product.description && String(product.description).trim()) ||
     (product.descirption && String(product.descirption).trim()) ||
     "";
 
-  if (descriptionText) {
-    const desc = document.createElement("p");
-    desc.className = "product-desc";
-    desc.textContent = descriptionText;
-    info.appendChild(desc);
+  const desc = document.createElement("p");
+  desc.className = descriptionText ? "product-desc" : "product-desc product-desc-empty";
+  desc.textContent = descriptionText || "賣家還沒有寫商品說明";
+  info.appendChild(desc);
+
+  const sellerLine = document.createElement("p");
+  sellerLine.className = "product-meta seller-row";
+
+  if (product.seller_id && !isAnonymous) {
+    sellerLine.appendChild(document.createTextNode("賣家："));
+    const sellerLink = document.createElement("a");
+    sellerLink.className = "seller-link";
+    sellerLink.href =
+      "/seller/?id=" + product.seller_id + "&productId=" + product.id;
+    sellerLink.textContent = shownSellerName + "（查看個人頁面）";
+    sellerLine.appendChild(sellerLink);
+  } else {
+    sellerLine.textContent = "賣家：" + shownSellerName;
   }
 
-  if (product.seller_id) {
+  info.appendChild(sellerLine);
+
+  if (isOwner) {
+    const editLink = document.createElement("a");
+    editLink.className = "contact-btn";
+    editLink.href = "/edit-product/?id=" + product.id;
+    editLink.textContent = "編輯商品";
+    info.appendChild(editLink);
+  } else if (product.seller_id) {
     const contactBtn = document.createElement("button");
     contactBtn.type = "button";
     contactBtn.className = "contact-btn";
@@ -140,7 +164,6 @@ async function showProduct(product, sellerProfile) {
 }
 
 async function loadProduct() {
-  // URLSearchParams 會讀網址 ? 後面的參數，例如 ?id=3
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
 
@@ -148,6 +171,10 @@ async function loadProduct() {
     showError("找不到商品編號");
     return;
   }
+
+  const schools = await loadSchools();
+  const userResult = await supabaseClient.auth.getUser();
+  const currentUser = userResult.data.user || null;
 
   const result = await supabaseClient
     .from("products")
@@ -161,20 +188,33 @@ async function loadProduct() {
     return;
   }
 
+  if (result.data.is_listed === false) {
+    showError("這件商品已下架");
+    return;
+  }
+
   document.title = result.data.title + "｜WAYFLOO";
 
   let sellerProfile = null;
   if (result.data.seller_id) {
-    const profileResult = await supabaseClient
+    let profileResult = await supabaseClient
       .from("profiles")
-      .select("display_name, avatar_url")
+      .select(PUBLIC_PROFILE_FIELDS)
       .eq("id", result.data.seller_id)
       .maybeSingle();
+
+    if (profileResult.error) {
+      profileResult = await supabaseClient
+        .from("profiles")
+        .select("display_name, avatar_url")
+        .eq("id", result.data.seller_id)
+        .maybeSingle();
+    }
 
     sellerProfile = profileResult.data;
   }
 
-  showProduct(result.data, sellerProfile);
+  showProduct(result.data, sellerProfile, schools, currentUser);
 }
 
 loadProduct();

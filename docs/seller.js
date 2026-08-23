@@ -2,11 +2,17 @@ const statusEl = document.getElementById("seller-status");
 const cardEl = document.getElementById("seller-card");
 const headingEl = document.getElementById("seller-heading");
 const avatarEl = document.getElementById("seller-avatar");
+const schoolEl = document.getElementById("seller-school");
 const departmentEl = document.getElementById("seller-department");
+const gradeEl = document.getElementById("seller-grade");
 const bioEl = document.getElementById("seller-bio");
 const productsSection = document.getElementById("seller-products");
 const productList = document.getElementById("product-list");
 const productsEmpty = document.getElementById("products-empty");
+const paginationEl = document.getElementById("product-pagination");
+
+let sellerProducts = [];
+let currentPage = 1;
 
 function formatPrice(price) {
   return "NT$" + Number(price).toLocaleString("zh-TW");
@@ -47,10 +53,33 @@ function createProfileProductCard(product) {
   return card;
 }
 
+function renderSellerProducts() {
+  const pageData = getPageItems(sellerProducts, currentPage);
+  currentPage = pageData.page;
+  productList.textContent = "";
+
+  pageData.items.forEach(function (product) {
+    productList.appendChild(createProfileProductCard(product));
+  });
+
+  if (pageData.total === 0) {
+    productsEmpty.textContent = "目前還沒有商品";
+    productsEmpty.classList.remove("hidden");
+  } else {
+    productsEmpty.classList.add("hidden");
+  }
+
+  renderPagination(paginationEl, pageData, function (nextPage) {
+    currentPage = nextPage;
+    renderSellerProducts();
+    window.scrollTo(0, 0);
+  });
+}
+
 async function loadSellerProducts(sellerId) {
   const result = await supabaseClient
     .from("products")
-    .select("id, title, price, image, seller_id")
+    .select("id, title, price, image, seller_id, is_listed")
     .eq("seller_id", sellerId)
     .order("id", { ascending: false });
 
@@ -63,19 +92,8 @@ async function loadSellerProducts(sellerId) {
     return;
   }
 
-  const rows = result.data || [];
-  productList.textContent = "";
-
-  rows.forEach(function (product) {
-    productList.appendChild(createProfileProductCard(product));
-  });
-
-  if (rows.length === 0) {
-    productsEmpty.textContent = "目前還沒有商品";
-    productsEmpty.classList.remove("hidden");
-  } else {
-    productsEmpty.classList.add("hidden");
-  }
+  sellerProducts = keepListedProducts(result.data);
+  renderSellerProducts();
 }
 
 async function loadSeller() {
@@ -97,12 +115,21 @@ async function loadSeller() {
     return;
   }
 
-  // 只讀公開欄位：姓名、頭像、科系
-  const result = await supabaseClient
+  const schools = await loadSchools();
+
+  let result = await supabaseClient
     .from("profiles")
-    .select("display_name, avatar_url, department, bio")
+    .select(PUBLIC_PROFILE_FIELDS)
     .eq("id", id)
     .maybeSingle();
+
+  if (result.error) {
+    result = await supabaseClient
+      .from("profiles")
+      .select("display_name, avatar_url, department, bio, school_id")
+      .eq("id", id)
+      .maybeSingle();
+  }
 
   if (result.error || !result.data) {
     console.error(result.error);
@@ -112,10 +139,17 @@ async function loadSeller() {
 
   const profile = result.data;
   const name = profile.display_name || "未設定姓名";
+  const school = findSchoolById(schools, profile.school_id);
 
   document.title = name + "｜WAYFLOO";
   headingEl.textContent = name;
+  if (schoolEl) {
+    schoolEl.textContent = school ? school.name : "尚未設定學校";
+  }
   departmentEl.textContent = profile.department || "未填寫";
+  if (gradeEl) {
+    gradeEl.textContent = profile.grade || "未填寫";
+  }
   avatarEl.src =
     profile.avatar_url || "https://placehold.co/160x160/f0f0f0/666666?text=頭像";
   avatarEl.alt = name;

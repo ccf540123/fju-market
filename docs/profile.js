@@ -1,16 +1,17 @@
 const form = document.getElementById("profile-form");
 const nameInput = document.getElementById("display-name");
 const departmentInput = document.getElementById("department");
+const gradeInput = document.getElementById("grade");
 const bioInput = document.getElementById("bio");
 const avatarInput = document.getElementById("avatar-file");
 const avatarPreview = document.getElementById("avatar-preview");
 const messageEl = document.getElementById("profile-message");
 const submitBtn = document.querySelector(".auth-submit");
-const productList = document.getElementById("product-list");
-const productsEmpty = document.getElementById("products-empty");
+const listedCountEl = document.getElementById("listed-count");
 
 let currentUser = null;
 let currentAvatarUrl = "";
+let currentProfile = null;
 
 function setMessage(text, type) {
   messageEl.textContent = text;
@@ -26,72 +27,24 @@ function formatPrice(price) {
   return "NT$" + Number(price).toLocaleString("zh-TW");
 }
 
-function createProfileProductCard(product) {
-  const card = document.createElement("article");
-  card.className = "product-card";
-
-  const img = document.createElement("img");
-  img.src = product.image || "https://placehold.co/400x400/f0f0f0/666666?text=商品";
-  img.alt = product.title;
-
-  const media = document.createElement("div");
-  media.className = "product-card-media";
-  media.appendChild(img);
-
-  const info = document.createElement("div");
-  info.className = "product-info";
-
-  const title = document.createElement("h3");
-  title.className = "product-title";
-  title.textContent = product.title;
-
-  const price = document.createElement("p");
-  price.className = "product-price";
-  price.textContent = formatPrice(product.price || 0);
-
-  info.appendChild(title);
-  info.appendChild(price);
-  card.appendChild(media);
-  card.appendChild(info);
-
-  card.addEventListener("click", function () {
-    window.location.href = "/product/?id=" + product.id;
-  });
-
-  return card;
-}
-
-async function loadMyProducts() {
-  if (!currentUser || !productList) {
+async function loadMyProductCount() {
+  if (!currentUser || !listedCountEl) {
     return;
   }
 
   const result = await supabaseClient
     .from("products")
-    .select("id, title, price, image, seller_id")
-    .eq("seller_id", currentUser.id)
-    .order("id", { ascending: false });
+    .select("id, is_listed")
+    .eq("seller_id", currentUser.id);
 
   if (result.error) {
     console.error(result.error);
-    productsEmpty.textContent = "商品載入失敗，請稍後再試";
-    productsEmpty.classList.remove("hidden");
+    listedCountEl.textContent = "商品數量載入失敗";
     return;
   }
 
-  const rows = result.data || [];
-  productList.textContent = "";
-
-  rows.forEach(function (product) {
-    productList.appendChild(createProfileProductCard(product));
-  });
-
-  if (rows.length === 0) {
-    productsEmpty.textContent = "你還沒有發布商品";
-    productsEmpty.classList.remove("hidden");
-  } else {
-    productsEmpty.classList.add("hidden");
-  }
+  const listed = keepListedProducts(result.data);
+  listedCountEl.textContent = "在售 " + listed.length + " 件";
 }
 
 async function loadProfile() {
@@ -135,12 +88,16 @@ async function loadProfile() {
     profile = insertResult.data;
   }
 
+  currentProfile = profile;
   nameInput.value = profile.display_name || "";
   departmentInput.value = profile.department || "";
+  if (gradeInput) {
+    gradeInput.value = profile.grade || "";
+  }
   bioInput.value = profile.bio || "";
   currentAvatarUrl = profile.avatar_url || "";
   showAvatar(currentAvatarUrl);
-  await loadMyProducts();
+  await loadMyProductCount();
 }
 
 form.addEventListener("submit", async function (event) {
@@ -152,6 +109,7 @@ form.addEventListener("submit", async function (event) {
 
   const displayName = nameInput.value.trim();
   const department = departmentInput.value.trim();
+  const grade = gradeInput ? gradeInput.value.trim() : "";
   const bio = bioInput.value.trim();
   const avatarFile = avatarInput.files[0];
 
@@ -187,20 +145,31 @@ form.addEventListener("submit", async function (event) {
     avatarUrl = publicUrlResult.data.publicUrl;
   }
 
+  const payload = {
+    display_name: displayName,
+    department: department,
+    bio: bio || null,
+    avatar_url: avatarUrl,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (grade || (currentProfile && currentProfile.grade !== undefined)) {
+    payload.grade = grade || null;
+  }
+
   const updateResult = await supabaseClient
     .from("profiles")
-    .update({
-      display_name: displayName,
-      department: department,
-      bio: bio || null,
-      avatar_url: avatarUrl,
-      updated_at: new Date().toISOString(),
-    })
+    .update(payload)
     .eq("id", currentUser.id);
 
   if (updateResult.error) {
     console.error(updateResult.error);
-    setMessage("儲存失敗，請稍後再試");
+    const errorText = (updateResult.error.message || "").toLowerCase();
+    if (errorText.indexOf("grade") !== -1) {
+      setMessage("資料庫還沒有年級欄位，請先到 Supabase 執行新增年級的 SQL");
+    } else {
+      setMessage("儲存失敗，請稍後再試");
+    }
     submitBtn.disabled = false;
     return;
   }

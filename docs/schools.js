@@ -56,21 +56,77 @@ function isValidStudentId(studentId) {
   return value !== "" && /^[a-zA-Z0-9._-]+$/.test(value);
 }
 
+function schoolOwnsEmail(school, email) {
+  const domain = getEmailDomain(email);
+  if (!school || !domain) {
+    return false;
+  }
+
+  return getSchoolDomains(school).indexOf(domain) !== -1;
+}
+
+function resolveSchoolForUser(schools, user, preferredSchoolId) {
+  const preferred = findSchoolById(schools, preferredSchoolId);
+  if (preferred && schoolOwnsEmail(preferred, user && user.email)) {
+    return preferred;
+  }
+
+  return findSchoolByEmail(schools, user && user.email);
+}
+
+function getBrowseSchoolOptions(schools, ownSchoolId) {
+  const options = [];
+  const own = findSchoolById(schools, ownSchoolId);
+
+  if (own) {
+    options.push({
+      value: String(own.id),
+      label: own.name + "（我的學校）",
+    });
+  }
+
+  options.push({
+    value: "all",
+    label: "全部學校",
+  });
+
+  (schools || []).forEach(function (school) {
+    if (own && String(school.id) === String(own.id)) {
+      return;
+    }
+    options.push({
+      value: String(school.id),
+      label: school.name,
+    });
+  });
+
+  return options;
+}
+
 async function loadSchools() {
-  const result = await supabaseClient
+  let result = await supabaseClient
     .from("schools")
-    .select("id, name, slug, email_domains")
+    .select("id, name, slug, email_domains, is_active")
     .order("id", { ascending: true });
+
+  if (result.error) {
+    result = await supabaseClient
+      .from("schools")
+      .select("id, name, slug, email_domains")
+      .order("id", { ascending: true });
+  }
 
   if (result.error) {
     console.error(result.error);
     return [];
   }
 
-  return result.data || [];
+  return (result.data || []).filter(function (school) {
+    return school.is_active !== false;
+  });
 }
 
-async function ensureProfileSchool(user, schools) {
+async function ensureProfileSchool(user, schools, preferredSchoolId) {
   if (!user) {
     return null;
   }
@@ -90,7 +146,7 @@ async function ensureProfileSchool(user, schools) {
     return profileResult.data.school_id;
   }
 
-  const school = findSchoolByEmail(schools, user.email);
+  const school = resolveSchoolForUser(schools, user, preferredSchoolId);
   if (!school) {
     return profileResult.data ? profileResult.data.school_id : null;
   }

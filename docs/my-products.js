@@ -1,5 +1,10 @@
 const productList = document.getElementById("product-list");
 const emptyMessage = document.getElementById("empty-message");
+const paginationEl = document.getElementById("product-pagination");
+
+let myProducts = [];
+let currentPage = 1;
+let currentUser = null;
 
 function formatPrice(price) {
   return "NT$" + Number(price).toLocaleString("zh-TW");
@@ -28,36 +33,51 @@ function createMyProductCard(product) {
   price.className = "product-price";
   price.textContent = formatPrice(product.price || 0);
 
-  const deleteBtn = document.createElement("button");
-  deleteBtn.type = "button";
-  deleteBtn.className = "delete-btn";
-  deleteBtn.textContent = "刪除";
-  deleteBtn.style.borderRadius ="12px";
+  const actions = document.createElement("div");
+  actions.className = "product-actions";
 
+  const editBtn = document.createElement("button");
+  editBtn.type = "button";
+  editBtn.className = "action-btn";
+  editBtn.textContent = "編輯";
+
+  const unlistBtn = document.createElement("button");
+  unlistBtn.type = "button";
+  unlistBtn.className = "action-btn";
+  unlistBtn.textContent = "下架";
+
+  actions.appendChild(editBtn);
+  actions.appendChild(unlistBtn);
   info.appendChild(title);
   info.appendChild(price);
-  info.appendChild(deleteBtn);
-
+  info.appendChild(actions);
   card.appendChild(media);
   card.appendChild(info);
 
-  deleteBtn.addEventListener("click", async function (event) {
+  editBtn.addEventListener("click", function (event) {
+    event.stopPropagation();
+    window.location.href = "/edit-product/?id=" + product.id;
+  });
+
+  unlistBtn.addEventListener("click", async function (event) {
     event.stopPropagation();
 
-    const confirmed = confirm("確定要刪除「" + product.title + "」嗎？");
+    const confirmed = confirm(
+      "確定要下架「" + product.title + "」嗎？下架後其他人就看不到這件商品。"
+    );
     if (!confirmed) {
       return;
     }
 
     const result = await supabaseClient
       .from("products")
-      .delete()
+      .update({ is_listed: false })
       .eq("id", product.id)
-      .eq("seller_id", product.seller_id);
+      .eq("seller_id", currentUser.id);
 
     if (result.error) {
       console.error(result.error);
-      alert("刪除失敗，請稍後再試");
+      alert("下架失敗：" + (result.error.message || "請稍後再試"));
       return;
     }
 
@@ -71,11 +91,32 @@ function createMyProductCard(product) {
   return card;
 }
 
+function renderMyProducts() {
+  const pageData = getPageItems(myProducts, currentPage);
+  currentPage = pageData.page;
+  productList.textContent = "";
+
+  pageData.items.forEach(function (product) {
+    productList.appendChild(createMyProductCard(product));
+  });
+
+  emptyMessage.classList.toggle("hidden", pageData.total > 0);
+  if (pageData.total === 0) {
+    emptyMessage.textContent = "你還沒有發布商品";
+  }
+
+  renderPagination(paginationEl, pageData, function (nextPage) {
+    currentPage = nextPage;
+    renderMyProducts();
+    window.scrollTo(0, 0);
+  });
+}
+
 async function loadMyProducts() {
   const userResult = await supabaseClient.auth.getUser();
-  const user = userResult.data.user;
+  currentUser = userResult.data.user;
 
-  if (!user) {
+  if (!currentUser) {
     alert("請先登入");
     window.location.href = "/login/";
     return;
@@ -84,28 +125,18 @@ async function loadMyProducts() {
   const result = await supabaseClient
     .from("products")
     .select("*")
-    .eq("seller_id", user.id);
+    .eq("seller_id", currentUser.id)
+    .order("id", { ascending: false });
 
   if (result.error) {
     console.error(result.error);
     emptyMessage.textContent = "載入失敗，請稍後再試";
+    emptyMessage.classList.remove("hidden");
     return;
   }
 
-  const myProducts = result.data;
-  // console.log(myProducts)
-  productList.textContent = "";
-
-  myProducts.forEach(function (product) {
-    productList.appendChild(createMyProductCard(product));
-  });
-
-  if (myProducts.length === 0) {
-    emptyMessage.textContent = "你還沒有發布商品";
-    emptyMessage.classList.remove("hidden");
-  } else {
-    emptyMessage.classList.add("hidden");
-  }
+  myProducts = keepListedProducts(result.data);
+  renderMyProducts();
 }
 
 loadMyProducts();

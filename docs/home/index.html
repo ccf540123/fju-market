@@ -6,7 +6,8 @@
     <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32">
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="../apple-touch-icon.png">
-    <link rel="stylesheet" href="/home.css?v=11">
+    <link rel="stylesheet" href="/home.css?v=20">
+    <link rel="stylesheet" href="/pagination.css?v=20">
     <title>商品瀏覽｜WAYFLOO</title>
 </head>
 <body>
@@ -84,6 +85,10 @@
                 <div class="list-header-left">
                     <h1 class="list-title">分類商品</h1>
                     <p class="list-count">共 <span id="product-count">0</span> 件商品</p>
+                    <label class="school-filter">
+                        學校
+                        <select id="school-filter"></select>
+                    </label>
                 </div>
                 <label class="sort-label">
                     排序
@@ -97,6 +102,7 @@
 
             <!-- 商品卡片網格 -->
             <div id="product-list" class="product-grid"></div>
+            <nav id="product-pagination" class="pagination-bar hidden"></nav>
             <p id="empty-message" class="empty-message hidden">找不到符合的商品</p>
         </main>
     </div>
@@ -147,6 +153,13 @@
             </label>
             <p class="form-hint">目前最多上傳 1 張照片，可從相簿選或直接拍照</p>
 
+            <p id="publish-school-hint" class="form-hint"></p>
+
+            <label class="anon-check">
+                <input type="checkbox" id="product-anonymous">
+                匿名刊登（別人看不到你的賣家頁）
+            </label>
+
             <p id="publish-message" class="publish-message"></p>
 
             <div class="publish-actions">
@@ -159,8 +172,10 @@
     <!-- Supabase 官方函式庫（CDN） -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/supabase-config.js"></script>
-    <script src="/unread.js?v=2"></script>
-    <script src="/schools.js?v=1"></script>
-    <script src="/home.js?v=12"></script>
+    <script src="/unread.js?v=20"></script>
+    <script src="/schools.js?v=20"></script>
+    <script src="/products.js?v=20"></script>
+    <script src="/pagination.js?v=20"></script>
+    <script src="/home.js?v=20"></script>
 </body>
 </html>

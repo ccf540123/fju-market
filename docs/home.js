@@ -30,6 +30,9 @@ const profileEntry = document.getElementById("profile-entry");
 let currentUser = null;
 let schools = [];
 let currentSchoolId = null;
+let ownSchoolId = null;
+let browseSchoolId = null;
+let currentPage = 1;
 let categories = [];
 let parentCategories = [];
 let subcategoriesByParent = new Map();
@@ -172,6 +175,7 @@ function buildCategoryMenu() {
   categoryList.querySelectorAll(".subcategory-btn").forEach(function (button) {
     button.addEventListener("click", function () {
       currentSubcategory = button.dataset.subcategory;
+      currentPage = 1;
       updateCategoryMenuState();
       renderProducts();
       collapseCategoryPanel();
@@ -326,6 +330,7 @@ function setCategory(category) {
   }
 
   renderCategoryMenu();
+  currentPage = 1;
   renderProducts();
 
   // 選「全部商品」、或這個主分類沒有子分類時，手機版直接收合
@@ -366,6 +371,16 @@ function createProductCard(product) {
 
   info.appendChild(title);
   info.appendChild(price);
+
+  if (browseSchoolId === "all") {
+    const school = findSchoolById(schools, product.school_id);
+    if (school) {
+      const schoolLine = document.createElement("p");
+      schoolLine.className = "product-seller";
+      schoolLine.textContent = school.name;
+      info.appendChild(schoolLine);
+    }
+  }
 
   card.appendChild(media);
   card.appendChild(info);
@@ -412,13 +427,25 @@ function renderProducts() {
 
   productList.textContent = "";
 
-  filteredProducts.forEach(function (product) {
+  const pageData = getPageItems(filteredProducts, currentPage);
+  currentPage = pageData.page;
+
+  pageData.items.forEach(function (product) {
     const card = createProductCard(product);
     productList.appendChild(card);
   });
 
-  productCount.textContent = filteredProducts.length;
-  emptyMessage.classList.toggle("hidden", filteredProducts.length > 0);
+  productCount.textContent = pageData.total;
+  emptyMessage.classList.toggle("hidden", pageData.total > 0);
+  renderPagination(
+    document.getElementById("product-pagination"),
+    pageData,
+    function (nextPage) {
+      currentPage = nextPage;
+      renderProducts();
+      window.scrollTo(0, 0);
+    }
+  );
 }
 
 async function loadCategories() {
@@ -467,18 +494,20 @@ async function loadProducts() {
 
   // from("products") = 讀 products 這張表
   // 先只顯示目前學校的商品（未登入時預設輔仁大學）
-  if (!currentSchoolId) {
-    console.error("school_id is missing");
+  if (!browseSchoolId) {
+    console.error("browse school is missing");
     emptyMessage.textContent = "載入失敗，請稍後再試";
     products = [];
     renderProducts();
     return;
   }
 
-  const result = await supabaseClient
-    .from("products")
-    .select("*")
-    .eq("school_id", currentSchoolId);
+  let query = supabaseClient.from("products").select("*");
+  if (browseSchoolId !== "all") {
+    query = query.eq("school_id", browseSchoolId);
+  }
+
+  const result = await query;
 
   if (result.error) {
     console.error(result.error);
@@ -486,7 +515,7 @@ async function loadProducts() {
     return;
   }
 
-  products = result.data;
+  products = keepListedProducts(result.data);
   emptyMessage.textContent = "找不到符合的商品";
   renderProducts();
 }
@@ -502,6 +531,7 @@ searchInputs.forEach(function (input) {
     searchInputs.forEach(function (otherInput) {
       otherInput.value = input.value;
     });
+    currentPage = 1;
     renderProducts();
   });
 });
@@ -509,8 +539,33 @@ searchInputs.forEach(function (input) {
 // 排序下拉選單
 sortSelect.addEventListener("change", function () {
   currentSort = sortSelect.value;
+  currentPage = 1;
   renderProducts();
 });
+
+function fillSchoolFilter() {
+  const select = document.getElementById("school-filter");
+  if (!select) {
+    return;
+  }
+
+  const options = getBrowseSchoolOptions(schools, ownSchoolId);
+  select.textContent = "";
+
+  options.forEach(function (item) {
+    const option = document.createElement("option");
+    option.value = item.value;
+    option.textContent = item.label;
+    select.appendChild(option);
+  });
+
+  const nextValue = browseSchoolId ? String(browseSchoolId) : "all";
+  select.value = nextValue;
+  if (select.value !== nextValue) {
+    browseSchoolId = "all";
+    select.value = "all";
+  }
+}
 
 function openPublishModal() {
   publishMessage.textContent = "";
@@ -518,6 +573,13 @@ function openPublishModal() {
   updatePublishSubcategoryOptions("");
   if (!parentCategories.length) {
     publishMessage.textContent = "分類尚未載入，請重新整理頁面後再試";
+  }
+  const schoolHint = document.getElementById("publish-school-hint");
+  if (schoolHint) {
+    const school = findSchoolById(schools, ownSchoolId || currentSchoolId);
+    schoolHint.textContent = school
+      ? "將刊登在「" + school.name + "」。刊登學校依你的帳號，不能改成其他學校。"
+      : "";
   }
   publishModal.classList.remove("hidden");
 }
@@ -620,11 +682,12 @@ publishForm.addEventListener("submit", async function (event) {
     return;
   }
 
-  if (!currentSchoolId) {
-    currentSchoolId = await ensureProfileSchool(currentUser, schools);
+  if (!ownSchoolId) {
+    ownSchoolId = await ensureProfileSchool(currentUser, schools);
+    currentSchoolId = ownSchoolId;
   }
 
-  if (!currentSchoolId) {
+  if (!ownSchoolId) {
     publishMessage.textContent = "找不到你的學校資料，請重新登入後再試";
     return;
   }
@@ -653,17 +716,27 @@ publishForm.addEventListener("submit", async function (event) {
 
   const imageUrl = publicUrlResult.data.publicUrl;
 
-  // 賣家名稱不寫進 products，詳情頁用 seller_id 去 profiles 取 display_name
-  const result = await supabaseClient.from("products").insert({
+  const anonymousInput = document.getElementById("product-anonymous");
+  const isAnonymous = anonymousInput ? anonymousInput.checked : false;
+
+  const payload = {
     title: title,
     price: price,
     seller_id: currentUser.id,
-    school_id: currentSchoolId,
+    school_id: ownSchoolId,
     category_id: Number(selectedCategory.id),
     category: selectedCategory.name,
     description: description || null,
     image: imageUrl,
-  });
+    is_anonymous: isAnonymous,
+  };
+
+  let result = await supabaseClient.from("products").insert(payload);
+
+  if (result.error && String(result.error.message).indexOf("is_anonymous") !== -1) {
+    delete payload.is_anonymous;
+    result = await supabaseClient.from("products").insert(payload);
+  }
 
   if (result.error) {
     console.error(result.error);
@@ -692,7 +765,10 @@ async function loadCurrentUser() {
 
   if (!currentUser) {
     const defaultSchool = findSchoolBySlug(schools, DEFAULT_SCHOOL_SLUG);
-    currentSchoolId = defaultSchool ? defaultSchool.id : null;
+    ownSchoolId = null;
+    currentSchoolId = null;
+    browseSchoolId = defaultSchool ? String(defaultSchool.id) : "all";
+    fillSchoolFilter();
     loginLink.classList.remove("hidden");
     userArea.classList.add("hidden");
     if (messagesEntry) {
@@ -701,7 +777,8 @@ async function loadCurrentUser() {
     return;
   }
 
-  currentSchoolId = await ensureProfileSchool(currentUser, schools);
+  ownSchoolId = await ensureProfileSchool(currentUser, schools);
+  currentSchoolId = ownSchoolId;
 
   const profileResult = await supabaseClient
     .from("profiles")
@@ -711,8 +788,11 @@ async function loadCurrentUser() {
 
   const profile = profileResult.data || {};
   if (profile.school_id) {
+    ownSchoolId = profile.school_id;
     currentSchoolId = profile.school_id;
   }
+  browseSchoolId = ownSchoolId ? String(ownSchoolId) : "all";
+  fillSchoolFilter();
   const displayName = profile.display_name || "使用者";
   const avatarUrl =
     profile.avatar_url ||
@@ -742,6 +822,15 @@ if (messagesEntry) {
 if (profileEntry) {
   profileEntry.addEventListener("click", function (event) {
     requireLoginOrStay(event);
+  });
+}
+
+const schoolFilter = document.getElementById("school-filter");
+if (schoolFilter) {
+  schoolFilter.addEventListener("change", function () {
+    browseSchoolId = schoolFilter.value || "all";
+    currentPage = 1;
+    loadProducts();
   });
 }
 

@@ -8,7 +8,8 @@
     <link rel="apple-touch-icon" href="../apple-touch-icon.png">
     <link rel="stylesheet" href="/landing.css">
     <link rel="stylesheet" href="/login.css">
-    <link rel="stylesheet" href="/profile.css?v=5">
+    <link rel="stylesheet" href="/profile.css?v=20">
+    <link rel="stylesheet" href="/pagination.css?v=20">
     <title>個人頁面｜WAYFLOO</title>
 </head>
 <body>
@@ -24,7 +25,9 @@
         <div id="seller-card" class="auth-card hidden">
             <h1 id="seller-heading" class="auth-title"></h1>
             <img id="seller-avatar" class="avatar-preview" alt="賣家頭像">
+            <p class="seller-field"><span>學校</span> <strong id="seller-school"></strong></p>
             <p class="seller-field"><span>科系</span> <strong id="seller-department"></strong></p>
+            <p class="seller-field"><span>年級</span> <strong id="seller-grade"></strong></p>
             <p id="seller-bio" class="seller-bio hidden"></p>
         </div>
 
@@ -32,11 +35,15 @@
             <h2 class="profile-products-title">發布的商品</h2>
             <p id="products-empty" class="profile-products-empty">載入中...</p>
             <div id="product-list" class="product-grid"></div>
+            <nav id="product-pagination" class="pagination-bar hidden"></nav>
         </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/supabase-config.js"></script>
-    <script src="/seller.js?v=4"></script>
+    <script src="/schools.js?v=20"></script>
+    <script src="/products.js?v=20"></script>
+    <script src="/pagination.js?v=20"></script>
+    <script src="/seller.js?v=20"></script>
 </body>
 </html>

@@ -239,7 +239,11 @@ form.addEventListener("submit", async function (event) {
       }
 
       if (result.data.user && result.data.session) {
-        await ensureProfileSchool(result.data.user, schools);
+        await ensureProfileSchool(
+          result.data.user,
+          schools,
+          schoolSelect.value
+        );
       }
 
       if (!result.data.session) {
@@ -262,7 +266,11 @@ form.addEventListener("submit", async function (event) {
     }
 
     if (result.data.user) {
-      await ensureProfileSchool(result.data.user, schools);
+      await ensureProfileSchool(
+        result.data.user,
+        schools,
+        schoolSelect.value
+      );
     }
 
     goToHome();

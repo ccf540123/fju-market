@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="../apple-touch-icon.png">
     <link rel="stylesheet" href="/landing.css">
     <link rel="stylesheet" href="/login.css">
-    <link rel="stylesheet" href="/profile.css?v=5">
+    <link rel="stylesheet" href="/profile.css?v=20">
     <title>我的頁面｜WAYFLOO</title>
 </head>
 <body>
@@ -31,6 +31,9 @@
                 <label for="department">科系</label>
                 <input type="text" id="department" name="department" placeholder="例如：資訊工程學系">
 
+                <label for="grade">年級</label>
+                <input type="text" id="grade" name="grade" placeholder="例如：大二">
+
                 <label for="bio">自我簡介</label>
                 <textarea id="bio" name="bio" rows="4" placeholder="想讓別人知道的話，可以寫在這裡"></textarea>
 
@@ -47,14 +50,15 @@
 
         <section class="profile-products">
             <h2 class="profile-products-title">我的商品</h2>
-            <p id="products-empty" class="profile-products-empty">載入中...</p>
-            <div id="product-list" class="product-grid"></div>
+            <p id="listed-count" class="profile-products-empty">載入中...</p>
+            <a href="/my-products/" class="box auth-submit profile-manage-btn">管理商品</a>
         </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/supabase-config.js"></script>
-    <script src="/schools.js?v=1"></script>
-    <script src="/profile.js?v=5"></script>
+    <script src="/schools.js?v=20"></script>
+    <script src="/products.js?v=20"></script>
+    <script src="/profile.js?v=20"></script>
 </body>
 </html>
