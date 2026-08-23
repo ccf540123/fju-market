@@ -17,6 +17,13 @@ function createMyProductCard(product) {
   const img = document.createElement("img");
   img.src = product.image || "https://placehold.co/400x400/f0f0f0/666666?text=商品";
   img.alt = product.title;
+  img.addEventListener("error", function () {
+    if (img.dataset.fallback === "1") {
+      return;
+    }
+    img.dataset.fallback = "1";
+    img.src = "https://placehold.co/400x400/f0f0f0/666666?text=商品";
+  });
 
   const media = document.createElement("div");
   media.className = "product-card-media";

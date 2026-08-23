@@ -41,6 +41,57 @@ body {
   text-align: left;
 }
 
+.product-page--list .product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 12px;
+}
+
+.product-page--list .product-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.product-page--list .product-card-media {
+  height: 160px;
+  width: 100%;
+  overflow: hidden;
+  background: #fafafa;
+}
+
+.product-page--list .product-card-media img {
+  display: block;
+  width: 100%;
+  height: 160px;
+  object-fit: contain;
+  object-position: center;
+  background: #fafafa;
+}
+
+.product-page--list .product-info {
+  padding: 12px;
+}
+
+.product-page--list .product-title {
+  margin: 0 0 8px;
+  color: #222;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.product-page--list .product-price {
+  margin: 0;
+  color: #d32f2f;
+  font-size: 16px;
+  font-weight: 700;
+}
+
 /* App 風格返回鍵 */
 .product-back-btn {
   position: fixed;
