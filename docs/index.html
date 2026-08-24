@@ -6,25 +6,39 @@
     <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="stylesheet" href="/landing.css?v=6">
+    <link rel="stylesheet" href="/landing.css?v=7">
     <title>WAYFLOO</title>
 </head>
 
 <body>
-    <header class="site-header">
-        <div class="header-inner">
-            <a href="/" class="logo">WAYFLOO</a>
-        </div>
-    </header>
-
     <main class="landing-page">
-        <h1 class="landing-title">WAYFLOO</h1>
-        <p class="subtitle">校園二手交易平台，提供大學生使用</p>
+        <section class="landing-hero">
+            <p class="landing-slogan">校園裡的二手交易</p>
+            <h1 class="landing-logo">WAYFLOO</h1>
 
-        <div class="container">
-            <a href="/login/" class="box">註冊/登入</a>
-            <a href="/home/" class="box">開始逛逛</a>
-        </div>
+            <div class="landing-art" aria-hidden="true">
+                <svg viewBox="0 0 200 160" fill="none">
+                    <rect x="28" y="78" width="144" height="62" rx="4" stroke="#111" stroke-width="2.2"/>
+                    <path d="M28 96h144" stroke="#111" stroke-width="2.2"/>
+                    <circle cx="58" cy="117" r="7" stroke="#111" stroke-width="2.2"/>
+                    <circle cx="142" cy="117" r="7" stroke="#111" stroke-width="2.2"/>
+                    <rect x="70" y="38" width="60" height="48" rx="4" stroke="#111" stroke-width="2.2"/>
+                    <path d="M82 38v-8h36v8" stroke="#111" stroke-width="2.2"/>
+                    <path d="M88 58h24" stroke="#777" stroke-width="2"/>
+                    <path d="M88 68h16" stroke="#777" stroke-width="2"/>
+                </svg>
+            </div>
+
+            <p class="landing-hook">同學都賣什麼？</p>
+
+            <div class="landing-actions">
+                <a href="/home/" class="box">開始逛逛</a>
+                <a href="/login/?mode=register" class="box landing-primary">免費加入</a>
+                <p class="landing-login-line">
+                    已有帳號？<a href="/login/">登入</a>
+                </p>
+            </div>
+        </section>
 
         <section class="feature-list">
             <article class="feature-card">
@@ -53,7 +67,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
             >
-                。。。
+                填寫回饋表單
             </a>
         </section>
     </main>

@@ -7,6 +7,78 @@
   padding: 32px 24px 60px;
 }
 
+.auth-page--flow {
+  min-height: 100dvh;
+  padding-top: 16px;
+  padding-bottom: 32px;
+}
+
+.auth-topbar {
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  width: min(420px, 100%);
+  margin-bottom: 20px;
+}
+
+.auth-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #111;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.auth-back:hover {
+  background: #ebebeb;
+}
+
+.auth-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.auth-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: #ddd;
+}
+
+.auth-dot.is-current {
+  width: 20px;
+  background: #111;
+}
+
+.auth-page--flow .auth-title {
+  align-self: stretch;
+  width: min(420px, 100%);
+  margin-bottom: 20px;
+  font-size: 22px;
+  text-align: left;
+}
+
+.auth-notice {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  background: #fafafa;
+  color: #555;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 .back-link {
   align-self: flex-start;
   margin-bottom: 24px;
@@ -171,6 +243,21 @@
 
 .form-message.success {
   color: #2e7d32;
+}
+
+@media (max-width: 720px) {
+  .auth-page--flow {
+    min-height: 100svh;
+    padding: 12px 20px 28px;
+  }
+
+  .auth-page--flow .auth-title {
+    font-size: 20px;
+  }
+
+  .auth-page--flow .auth-card {
+    padding: 22px 18px 26px;
+  }
 }
 
 .hidden {

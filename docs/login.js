@@ -8,10 +8,18 @@ const tabs = document.querySelectorAll(".auth-tab");
 const confirmGroup = document.getElementById("confirm-password-group");
 const confirmInput = document.getElementById("confirm-password");
 const messageEl = document.getElementById("form-message");
-const submitBtn = document.querySelector(".auth-submit");
+const submitBtn = form.querySelector("button[type='submit']");
 const forgotBtn = document.getElementById("forgot-password-btn");
+const backBtn = document.getElementById("auth-back");
+const nextBtn = document.getElementById("auth-next");
+const step1 = document.getElementById("auth-step-1");
+const step2 = document.getElementById("auth-step-2");
+const headingEl = document.getElementById("auth-heading");
+const progressEl = document.getElementById("auth-progress");
+const progressDots = progressEl.querySelectorAll(".auth-dot");
 
 let mode = "login";
+let currentStep = 1;
 let schools = [];
 
 const EYE_OPEN =
@@ -172,6 +180,66 @@ function goToHome() {
   window.location.href = "/home/";
 }
 
+function updateHeading() {
+  if (currentStep === 1) {
+    headingEl.textContent = "你就讀哪所學校？";
+    return;
+  }
+
+  headingEl.textContent =
+    mode === "register" ? "設定學號與密碼" : "輸入學號與密碼";
+}
+
+function setStep(step) {
+  currentStep = step;
+
+  step1.classList.toggle("hidden", step !== 1);
+  step2.classList.toggle("hidden", step !== 2);
+
+  progressDots.forEach(function (dot, index) {
+    dot.classList.toggle("is-current", index === step - 1);
+  });
+
+  progressEl.setAttribute("aria-label", "第 " + step + " 步，共 2 步");
+  updateHeading();
+  setMessage("");
+
+  if (step === 2) {
+    studentIdInput.focus();
+  }
+}
+
+function goBack() {
+  if (currentStep === 2) {
+    setStep(1);
+    return;
+  }
+
+  window.location.href = "/";
+}
+
+function goToStep2() {
+  if (!schoolSelect.value) {
+    setMessage("請選擇學校");
+    return;
+  }
+
+  const school = getSelectedSchool();
+  const domains = getSchoolDomains(school);
+
+  if (domains.length === 0) {
+    setMessage("找不到這間學校的信箱網域");
+    return;
+  }
+
+  if (domains.length > 1 && !emailDomainSelect.value) {
+    setMessage("請選擇學校信箱類型");
+    return;
+  }
+
+  setStep(2);
+}
+
 function switchMode(nextMode) {
   mode = nextMode;
 
@@ -184,6 +252,7 @@ function switchMode(nextMode) {
   confirmInput.required = isRegister;
   submitBtn.textContent = isRegister ? "註冊" : "登入";
   forgotBtn.classList.toggle("hidden", isRegister);
+  updateHeading();
   setMessage("");
 }
 
@@ -193,12 +262,20 @@ tabs.forEach(function (tab) {
   });
 });
 
+backBtn.addEventListener("click", goBack);
+nextBtn.addEventListener("click", goToStep2);
+
 schoolSelect.addEventListener("change", updateDomainOptions);
 studentIdInput.addEventListener("input", updateComposedEmailHint);
 emailDomainSelect.addEventListener("change", updateComposedEmailHint);
 
 form.addEventListener("submit", async function (event) {
   event.preventDefault();
+
+  if (currentStep === 1) {
+    goToStep2();
+    return;
+  }
 
   const email = getLoginEmail();
   const password = form.password.value;
@@ -329,6 +406,12 @@ async function initLoginPage() {
   });
 
   updateDomainOptions();
+
+  if (window.location.search.indexOf("mode=register") !== -1) {
+    switchMode("register");
+  }
+
+  setStep(1);
 }
 
 initLoginPage();
