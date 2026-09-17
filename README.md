@@ -1,12 +1,13 @@
 # WAYFLOO 網站
 
-> 校園二手交易平台（GitHub Pages）
+官方入口網站（GitHub Pages）：介紹 WAYFLOO，並引導下載 iOS / Android App。
 
-你好,我是輔仁大學的學生
-這是我做的二手交易網站（只限學生可以使用）
-點擊下方可以看看網站～
+👉 [https://www.wayfloo.com/](https://www.wayfloo.com/)
 
+## 目前定位
 
-## 網站
+- 品牌與產品介紹
+- App 下載導流（App Store / Google Play）
+- 之後可再擴充說明頁、支援頁等內容
 
-👉 [進入網站](https://www.wayfloo.com/)
+商店連結請在 `docs/landing.js` 的 `STORE_URLS` 填入。

@@ -3,77 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="WAYFLOO — 校園裡的二手交易。下載 iOS / Android App，在同學之間安心買賣。">
     <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="stylesheet" href="/landing.css?v=7">
-    <title>WAYFLOO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/landing.css?v=8">
+    <title>WAYFLOO｜校園裡的二手交易</title>
 </head>
-
-<body>
-    <main class="landing-page">
-        <section class="landing-hero">
-            <p class="landing-slogan">校園裡的二手交易</p>
-            <h1 class="landing-logo">WAYFLOO</h1>
-
-            <div class="landing-art" aria-hidden="true">
-                <svg viewBox="0 0 200 160" fill="none">
-                    <rect x="28" y="78" width="144" height="62" rx="4" stroke="#111" stroke-width="2.2"/>
-                    <path d="M28 96h144" stroke="#111" stroke-width="2.2"/>
-                    <circle cx="58" cy="117" r="7" stroke="#111" stroke-width="2.2"/>
-                    <circle cx="142" cy="117" r="7" stroke="#111" stroke-width="2.2"/>
-                    <rect x="70" y="38" width="60" height="48" rx="4" stroke="#111" stroke-width="2.2"/>
-                    <path d="M82 38v-8h36v8" stroke="#111" stroke-width="2.2"/>
-                    <path d="M88 58h24" stroke="#777" stroke-width="2"/>
-                    <path d="M88 68h16" stroke="#777" stroke-width="2"/>
-                </svg>
-            </div>
-
-            <p class="landing-hook">同學都賣什麼？</p>
-
-            <div class="landing-actions">
-                <a href="/home/" class="box">開始逛逛</a>
-                <a href="/login/?mode=register" class="box landing-primary">免費加入</a>
-                <p class="landing-login-line">
-                    已有帳號？<a href="/login/">登入</a>
-                </p>
-            </div>
-        </section>
-
-        <section class="feature-list">
-            <article class="feature-card">
-                <div class="feature-icon">🔍</div>
-                <h3>搜尋課本、生活用品、3C 等</h3>
-                <p>輕鬆找到你需要的二手物品</p>
-            </article>
-            <article class="feature-card">
-                <div class="feature-icon">📦</div>
-                <h3>出售閒置物品</h3>
-                <p>用幾分鐘把不需要的東西放上來</p>
-            </article>
-            <article class="feature-card">
-                <div class="feature-icon">🏫</div>
-                <h3>校園交易</h3>
-                <p>和校園裡的同學買賣二手物品</p>
-            </article>
-        </section>
-
-        <section class="feedback-section">
-            <h2 class="feedback-title">給我一些回饋</h2>
-            <p class="feedback-text">網站目前還在測試中，用過之後如果有什麼想法、遇到什麼問題，或是想看到什麼功能，都可以跟我說！</p>
-            <a
-                class="feedback-btn"
-                href="https://forms.gle/Bt8ziPwA1pkoFEcF7"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                填寫回饋表單
+<body class="landing-body">
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="/" class="logo" aria-label="WAYFLOO 首頁">
+                <span class="brand-mark brand-mark--nav" aria-hidden="true">
+                    <span class="brand-text">WAYFL</span>
+                    <span class="brand-eye"></span>
+                    <span class="brand-eye"></span>
+                </span>
             </a>
+            <a href="#download" class="header-cta">下載 App</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero" aria-label="WAYFLOO 介紹">
+            <div class="hero-media" aria-hidden="true">
+                <img
+                    class="hero-image"
+                    src="/landing-cover.png"
+                    alt=""
+                    width="640"
+                    height="640"
+                >
+            </div>
+            <div class="hero-copy">
+                <p class="hero-kicker reveal">校園裡的二手交易</p>
+                <h1 class="hero-brand reveal reveal-delay-1">
+                    <span class="brand-mark brand-mark--hero" aria-label="WAYFLOO">
+                        <span class="brand-text">WAYFL</span>
+                        <span class="brand-eye"></span>
+                        <span class="brand-eye"></span>
+                    </span>
+                </h1>
+                <p class="hero-lead reveal reveal-delay-2">專為學生打造的二手交易 App。在校園裡買賣課本、生活用品與 3C。</p>
+                <div class="hero-actions reveal reveal-delay-3">
+                    <a class="store-btn store-btn--ios" href="#download" data-store="ios">
+                        <span class="store-btn-label">App Store</span>
+                        <span class="store-btn-sub" data-store-sub="ios">下載 iOS 版</span>
+                    </a>
+                    <a class="store-btn store-btn--android" href="#download" data-store="android">
+                        <span class="store-btn-label">Google Play</span>
+                        <span class="store-btn-sub" data-store-sub="android">下載 Android 版</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="intro" id="about">
+            <h2 class="intro-title">為什麼是 WAYFLOO</h2>
+            <p class="intro-text">把閒置留給同學，也從同學手上找到需要的東西。交易發生在校園裡，距離近、溝通快、更安心。</p>
+        </section>
+
+        <section class="download" id="download">
+            <h2 class="download-title">下載 WAYFLOO</h2>
+            <p class="download-text">選擇你的裝置，開始在校園裡買賣二手物品。</p>
+            <div class="download-actions">
+                <a class="store-btn store-btn--ios" href="#download" data-store="ios">
+                    <span class="store-btn-label">App Store</span>
+                    <span class="store-btn-sub" data-store-sub="ios">下載 iOS 版</span>
+                </a>
+                <a class="store-btn store-btn--android" href="#download" data-store="android">
+                    <span class="store-btn-label">Google Play</span>
+                    <span class="store-btn-sub" data-store-sub="android">下載 Android 版</span>
+                </a>
+            </div>
+            <p class="download-note" id="download-note" hidden>商店連結準備中，敬請期待。</p>
         </section>
     </main>
 
     <footer class="site-footer">
-        WAYFLOO · 非官方學生平台
+        <p class="footer-brand">WAYFLOO</p>
+        <p class="footer-meta">校園裡的二手交易</p>
     </footer>
+
+    <script src="/landing.js?v=8"></script>
 </body>
 </html>
