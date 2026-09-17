@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../../favicon-32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+    <link rel="stylesheet" href="/landing.css">
+    <link rel="stylesheet" href="/login.css">
+    <link rel="stylesheet" href="/admin-school-verify.css?v=1">
+    <title>學生證審核｜WAYFLOO Admin</title>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="/home/" class="logo">WAYFLOO</a>
+        </div>
+    </header>
+
+    <main class="auth-page admin-page">
+        <a href="/profile/" class="back-link">← 返回個人頁</a>
+        <h1 class="admin-title">學生證人工審核</h1>
+        <p class="admin-hint">僅管理員可用。圖片來自 private storage，不會公開。</p>
+
+        <div id="admin-gate" class="admin-gate">檢查權限中...</div>
+
+        <div id="admin-panel" class="admin-panel hidden">
+            <div class="admin-filters" id="filter-row">
+                <button type="button" class="filter-chip is-on" data-filter="pending">待審核</button>
+                <button type="button" class="filter-chip" data-filter="approved">已通過</button>
+                <button type="button" class="filter-chip" data-filter="rejected">已拒絕</button>
+                <button type="button" class="filter-chip" data-filter="all">全部</button>
+            </div>
+
+            <p id="admin-status" class="form-message"></p>
+            <div id="request-list" class="request-list"></div>
+        </div>
+    </main>
+
+    <div id="preview-mask" class="preview-mask hidden">
+        <img id="preview-image" class="preview-image" alt="學生證預覽">
+    </div>
+
+    <div id="reject-mask" class="reject-mask hidden">
+        <div class="reject-card">
+            <h2>拒絕原因</h2>
+            <textarea id="reject-note" rows="4" placeholder="請輸入拒絕原因"></textarea>
+            <button type="button" id="reject-confirm" class="box auth-submit">確認拒絕</button>
+            <button type="button" id="reject-cancel" class="admin-cancel">取消</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/supabase-config.js"></script>
+    <script src="/admin-school-verify.js?v=1"></script>
+</body>
+</html>

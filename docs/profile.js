@@ -98,6 +98,14 @@ async function loadProfile() {
   currentAvatarUrl = profile.avatar_url || "";
   showAvatar(currentAvatarUrl);
   await loadMyProductCount();
+
+  const adminLink = document.getElementById("admin-school-verify-link");
+  if (adminLink) {
+    const adminResult = await supabaseClient.rpc("is_wayfloo_admin");
+    if (!adminResult.error && adminResult.data === true) {
+      adminLink.hidden = false;
+    }
+  }
 }
 
 form.addEventListener("submit", async function (event) {
