@@ -8,6 +8,16 @@
 
 - 首頁品牌與產品介紹
 - App Store / Google Play 下載入口
+- 隱私權政策、使用條款、社群規範、聯絡我們、刪除帳號說明
+
+公開網址：
+
+- https://www.wayfloo.com/privacy/
+- https://www.wayfloo.com/terms/
+- https://www.wayfloo.com/community/
+- https://www.wayfloo.com/contact/
+- https://www.wayfloo.com/deletion/
+- https://www.wayfloo.com/account-deletion.html
 
 商店連結請在 `docs/landing.js` 的 `STORE_URLS` 填入。
 

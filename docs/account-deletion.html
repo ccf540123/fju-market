@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>刪除帳號｜WAYFLOO</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">WAYFLOO</div>
+    <h1>刪除帳號</h1>
+    <p class="muted" id="lead"></p>
+
+    <section>
+      <h2>會刪除的資料</h2>
+      <ul id="will-delete"></ul>
+    </section>
+
+    <section>
+      <h2>不會或可能暫時保留</h2>
+      <ul id="will-not-delete"></ul>
+    </section>
+
+    <section>
+      <h2>注意事項</h2>
+      <ul id="notes"></ul>
+    </section>
+
+    <form id="form" class="card">
+      <label for="email">登入信箱</label>
+      <input id="email" type="email" autocomplete="username" required />
+      <label for="password">密碼</label>
+      <input id="password" type="password" autocomplete="current-password" required />
+      <label for="confirm">請輸入「刪除」以確認</label>
+      <input id="confirm" type="text" autocomplete="off" />
+      <p id="message" class="muted"></p>
+      <button id="submit" type="submit">刪除我的帳號</button>
+    </form>
+    <nav>
+      <a class="secondary" href="./index.html">回頁面目錄</a>
+      <a class="secondary" href="./deletion.html">刪除帳號說明</a>
+      <a class="secondary" href="./privacy.html">隱私權政策</a>
+    </nav>
+  </div>
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./config.js";
+    import { accountDeletionCopy } from "./legal-content.js";
+
+    document.querySelector("#lead").textContent = accountDeletionCopy.lead;
+
+    function fillList(id, items) {
+      const list = document.querySelector(id);
+      items.forEach(function (item) {
+        const li = document.createElement("li");
+        li.textContent = item;
+        list.appendChild(li);
+      });
+    }
+
+    fillList("#will-delete", accountDeletionCopy.willDelete);
+    fillList("#will-not-delete", accountDeletionCopy.willNotDelete);
+    fillList("#notes", accountDeletionCopy.notes);
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const form = document.querySelector("#form");
+    const message = document.querySelector("#message");
+    const submit = document.querySelector("#submit");
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      const confirmText = document.querySelector("#confirm").value.trim();
+      if (confirmText !== "刪除") {
+        message.className = "error";
+        message.textContent = "請輸入「刪除」才能繼續。";
+        return;
+      }
+
+      submit.disabled = true;
+      message.className = "muted";
+      message.textContent = "登入並刪除中...";
+
+      const email = document.querySelector("#email").value.trim();
+      const password = document.querySelector("#password").value;
+      const signIn = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (signIn.error) {
+        submit.disabled = false;
+        message.className = "error";
+        message.textContent = "登入失敗，請確認信箱與密碼。";
+        return;
+      }
+
+      const deleted = await import("./account-delete.js").then(function (mod) {
+        return mod.deleteSignedInAccount(supabase);
+      });
+
+      if (!deleted.ok) {
+        submit.disabled = false;
+        message.className = "error";
+        message.textContent = deleted.message || "刪除失敗，請稍後再試。";
+        return;
+      }
+
+      form.reset();
+      submit.disabled = true;
+      message.className = "muted";
+      message.textContent = "帳號與相關資料已刪除。這個瀏覽器的登入也已清除。";
+    });
+  </script>
+</body>
+</html>
