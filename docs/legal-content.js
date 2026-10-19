@@ -2,7 +2,7 @@
 // 更新條款時：改 TERMS_VERSION，並同步更新資料庫 legal_documents 的 required_version。
 
 export const TERMS_VERSION = "2026-09-25";
-export const LEGAL_UPDATED_AT = "2026年10月19日";
+export const LEGAL_UPDATED_AT = "2026年10月20日";
 
 export const CONTACT_EMAIL = "support@wayfloo.com";
 
@@ -118,6 +118,7 @@ export const legalPages = {
         items: [
           "雲端帳號、資料庫與檔案服務：負責登入、保存資料與圖片，以及寄送學校信箱驗證碼、發送新訊息推播等後端工作。資料目前存放在澳洲雪梨區域。",
           "Expo：App 開發與發佈相關工具、圖片選取與壓縮、推播註冊與推播發送。",
+          "Sentry：接收 App 閃退與錯誤報告，以及畫面載入速度等效能資料（裝置型號、系統版本、App 版本、錯誤內容與發生前的操作紀錄），用來找出並修正問題；不收集 IP 位址。資料存放在美國。",
           "Apple App Store／Google Play：安裝、更新與系統推播通道依各平台規則處理。",
         ],
       },
